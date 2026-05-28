@@ -17,7 +17,15 @@
   - [🔴 10. Encapsulation in Java](#-10---encapsulation-in-java--data-hiding--controlled-access)
   - [🔵 11. Access Modifiers in Java](#-11---access-modifiers-in-java--controlling-visibility-encapsulation--inheritance)
 ---
+# Part 4: Core OOP Pillar – Inheritance
+- 12 - DRY Principle 
+- 13- Inheritance (What, Syntax, Types) 
+- 14 - IS-A and HAS-A Relationships
+- 15 - Association, Aggregation, Composition 
+- 16 - Composition vs Inheritance 
+- 17 - Variable Hiding & Method Hiding 
 
+---
 
 ## 🟢 1. What is a Class in Java?
 
@@ -923,5 +931,1026 @@ Access modifiers are crucial because they help you:
 * Support inheritance safely
 
 In real-world applications, especially large systems, proper use of access modifiers ensures that your code is **secure, maintainable, and scalable**.
+
+---
+# 🔵 12 - What is DRY (Don't Repeat Yourself)?
+
+The **DRY principle** is a fundamental software engineering guideline that says:
+
+> *“Every piece of knowledge or logic must have a single, unambiguous, authoritative representation in the system.”*
+
+In simpler terms, **don’t write the same code more than once**. Instead, **reuse it** through methods, classes, inheritance, or other mechanisms.
+
+**Why?**
+
+* Reduces **bugs**: if you need to fix something, you fix it in **one place** instead of multiple places.
+* Makes code **easier to maintain**.
+* Improves **readability and organization**.
+* Reduces **redundancy**, saving time and memory.
+
+**Analogy:**
+Imagine a bakery: instead of writing the chocolate cake recipe 5 times in your recipe book, you write it **once** and refer to it whenever needed. If you change the recipe later, you only update it once.
+
+---
+
+## 🟢 12.1 - How DRY Applies in Java
+
+Java, being **object-oriented**, has several features that naturally help you follow DRY:
+
+### Methods
+
+Instead of writing the same logic multiple times, put it in a **method** and call it whenever needed.
+
+```java
+class Calculator {
+    int add(int a, int b) {
+        return a + b; // logic written only once
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Calculator calc = new Calculator();
+        System.out.println(calc.add(5, 3)); // reuse method
+        System.out.println(calc.add(10, 20)); // reuse again
+    }
+}
+```
+
+---
+
+### Constructors & Constructor Chaining
+
+Instead of repeating initialization code in multiple constructors, use **constructor chaining** with `this()`.
+
+```java
+class IceCream {
+    String flavor;
+    String size;
+
+    IceCream(String flavor) {
+        this.flavor = flavor;
+        this.size = "Medium";
+    }
+
+    IceCream(String flavor, String size) {
+        this(flavor); // reuses code from the first constructor
+        this.size = size;
+    }
+}
+```
+
+Here, we **avoid repeating `this.flavor = flavor;`**, following DRY.
+
+---
+
+### Inheritance
+
+If multiple classes share behavior, we put that behavior in a **parent class** instead of repeating it in each child class.
+
+```java
+class Vehicle {
+    void start() { System.out.println("Vehicle started"); }
+}
+
+class Car extends Vehicle {}
+class Bike extends Vehicle {}
+
+public class Main {
+    public static void main(String[] args) {
+        Car c = new Car();
+        Bike b = new Bike();
+        c.start(); // reused method from Vehicle
+        b.start(); // reused method from Vehicle
+    }
+}
+```
+
+The `start()` method is **written only once** in `Vehicle` and reused in `Car` and `Bike`.
+
+---
+
+### Constants and Static Fields
+
+Instead of repeating a value multiple times, define it as a **constant** using `static final`.
+
+```java
+class MathConstants {
+    static final double PI = 3.14159; // defined once
+}
+
+public class Main {
+    public static void main(String[] args) {
+        double area = MathConstants.PI * 5 * 5; // reuse
+        double circumference = 2 * MathConstants.PI * 5; // reuse
+    }
+}
+```
+
+If you ever need to change PI, you update it in **one place**.
+
+---
+
+## 🔴 12.2 - Benefits of DRY in Java
+
+1. **Maintainability**: Easier to update logic in one place.
+2. **Readability**: Cleaner code with less repetition.
+3. **Reduced bugs**: Fixing one method updates all usages.
+4. **Reusability**: Encourages modular, reusable code.
+
+---
+
+**In short:**
+DRY is about **writing code once and reusing it**. Java’s features like **methods, constructors, inheritance, static fields, and classes** help us implement DRY effectively.
+Alright, let’s go **all-in on inheritance in Java**. I’ll explain **what inheritance is**, **all inheritance types**, **how Java actually supports them**, and then go through **dos and don’ts**, with **examples, diagrams, JVM intuition, and real-world analogies**—all in clear paragraphs, beginner-friendly.
+
+---
+# 🔵 13 - What is Inheritance in Java?
+
+Inheritance is an **OOP mechanism** that allows one class (child/subclass) to **reuse and extend** the properties and behaviors of another class (parent/superclass). The keyword used is `extends`.
+
+In inheritance, the **child class automatically gets access** to the non-private fields and methods of the parent class. This promotes **code reusability**, **maintainability**, and **logical hierarchy**.
+
+**Real-world analogy:**
+A **child inherits traits** from parents. A child may add new traits or override some behaviors, but the basic structure comes from the parent.
+
+---
+
+## 🟢 13.1 -  Basic Syntax of Inheritance
+
+```java
+class Parent {
+    void show() {
+        System.out.println("Parent class method");
+    }
+}
+
+class Child extends Parent {
+    void display() {
+        System.out.println("Child class method");
+    }
+}
+```
+
+Here, `Child` inherits the `show()` method from `Parent`.
+
+---
+
+## 🔴 13.2 - Types of Inheritance in Java- 
+
+Java conceptually supports **five types of inheritance**, but **only some are allowed using classes**. Let’s go through each clearly.
+
+---
+
+## 🔵 **Single Inheritance**
+
+**Definition:**
+A child class inherits from **one parent class**.
+
+```
+Parent
+  ↓
+Child
+```
+
+**Example:**
+
+```java
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+```
+
+This is the **simplest and most commonly used** form of inheritance.
+
+✔ Supported in Java
+✔ Easy to understand
+✔ No ambiguity
+
+---
+
+## 🟢 Multilevel Inheritance
+
+**Definition:**
+A class inherits from a parent, which itself inherits from another class.
+
+```
+Grandparent
+     ↓
+  Parent
+     ↓
+   Child
+```
+
+**Example:**
+
+```java
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Mammal extends Animal {
+    void walk() {
+        System.out.println("Walking...");
+    }
+}
+
+class Dog extends Mammal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+```
+
+Here, `Dog` inherits from both `Mammal` and `Animal`.
+
+✔ Supported in Java
+✔ Promotes hierarchical design
+✔ Common in real-world modeling
+
+---
+
+## 🟠 Hierarchical Inheritance
+
+**Definition:**
+Multiple child classes inherit from **the same parent class**.
+
+```
+        Parent
+       /      \
+   Child1   Child2
+```
+
+**Example:**
+
+```java
+class Animal {
+    void eat() {
+        System.out.println("Eating...");
+    }
+}
+
+class Dog extends Animal {
+    void bark() {
+        System.out.println("Barking...");
+    }
+}
+
+class Cat extends Animal {
+    void meow() {
+        System.out.println("Meowing...");
+    }
+}
+```
+
+Both `Dog` and `Cat` reuse `Animal` behavior.
+
+✔ Supported in Java
+✔ Very common
+✔ Encourages reuse
+
+---
+
+## 🔴 Multiple Inheritance (NOT supported using classes)
+
+**Definition:**
+A class inherits from **more than one parent class**.
+
+```
+Parent1     Parent2
+     \       /
+        Child
+```
+
+### ❌ Why Java does NOT support this with classes
+
+```java
+class A {
+    void show() { System.out.println("A"); }
+}
+
+class B {
+    void show() { System.out.println("B"); }
+}
+
+// NOT ALLOWED
+class C extends A, B { }
+```
+
+### ⚠ Problem: **Diamond Problem**
+
+```
+      A
+     / \
+    B   C
+     \ /
+      D
+```
+
+If `D` calls `show()`, which version should JVM choose?
+👉 **Ambiguity**
+
+---
+
+## 🟣 Multiple Inheritance using Interfaces (SUPPORTED)
+
+Java solves the multiple inheritance problem using **interfaces**, not classes.
+
+**Example:**
+
+```java
+interface A {
+    void show();
+}
+
+interface B {
+    void show();
+}
+
+class C implements A, B {
+    public void show() {
+        System.out.println("Implemented safely");
+    }
+}
+```
+
+✔ Supported using interfaces
+✔ No ambiguity
+✔ JVM forces implementation
+
+---
+
+## 🔵 Hybrid Inheritance
+
+**Definition:**
+Combination of multiple inheritance types.
+
+```
+       A
+      / \
+     B   C
+      \ /
+       D
+```
+
+❌ Not supported with classes
+✔ Supported using interfaces
+
+---
+
+## 🧠 13.3 - JVM-Level Understanding of Inheritance
+
+* A child object **contains parent class fields** internally.
+* Methods are resolved using **runtime polymorphism** (method overriding).
+* `super` keyword refers to the parent class.
+
+```
+Heap Memory
+┌────────────────────┐
+│ Dog Object         │
+│ ┌──────────────┐  │
+│ │ Animal data  │  │
+│ │ Mammal data  │  │
+│ │ Dog data     │  │
+│ └──────────────┘  │
+└────────────────────┘
+```
+
+---
+# 🔵 14 - Understanding IS-A and HAS-A Relationships in Object-Oriented Programming
+
+When we design software using **Object-Oriented Programming (OOP)**, we try to model real-world entities using **classes** and **objects**. Just like in the real world, objects can be related to each other in different ways. Two of the most important and commonly used relationships are **IS-A** and **HAS-A**. These relationships help us write clean, reusable, and logically structured code that is easy to understand and maintain, especially for beginners.
+
+---
+
+## 🟢 14.1 - What is an IS-A Relationship? (Inheritance)**
+
+An **IS-A relationship** represents **inheritance**, which means one class is a specialized version of another class. In simple terms, if we can say **“A is a B”**, then it is an IS-A relationship.
+
+For example:
+- A **Dog is an Animal**
+- A **Car is a Vehicle**
+- A **Student is a Person**
+
+This relationship allows a child class to **inherit properties and behaviors** from a parent class. The main advantage here is **code reusability**. Instead of writing the same code again, the child class automatically gets it from the parent class.
+
+In programming, IS-A relationships are implemented using the `extends` keyword (in Java), or similar mechanisms in other languages.
+
+---
+
+### 🟣 **IS-A Relationship Code Example (Java)**
+
+```java
+// Parent class
+class Animal {
+    void eat() {
+        System.out.println("This animal eats food");
+    }
+}
+
+// Child class
+class Dog extends Animal {
+    void bark() {
+        System.out.println("The dog barks");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        dog.eat();   // Inherited method
+        dog.bark();  // Dog's own method
+    }
+}
+```
+
+Here, **Dog IS-A Animal**. The `Dog` class automatically gets the `eat()` method from the `Animal` class. This means the dog can eat **without us rewriting the code**, which is the essence of inheritance.
+
+---
+
+### 🧩 **IS-A Relationship Diagram**
+
+```
+        Animal
+           |
+           |  IS-A
+           ↓
+          Dog
+```
+
+This diagram shows that `Dog` is a specialized form of `Animal`. Any behavior common to all animals can be placed in the `Animal` class and reused by all its child classes.
+
+---
+
+## 🟠 14.2 - What is a HAS-A Relationship? (Composition / Aggregation)
+
+A **HAS-A relationship** means one class **contains** another class as a part of it. If we can say **“A has a B”**, then it is a HAS-A relationship.
+
+Examples:
+- A **Car has an Engine**
+- A **Person has a Heart**
+- A **Library has Books**
+
+This relationship is about **using objects**, not inheriting them. HAS-A relationships improve **flexibility** because we can change the internal components without affecting the main class structure.
+
+HAS-A is implemented by **creating an object of one class inside another class**.
+
+---
+
+### 🟡 HAS-A Relationship Code Example (Java)
+
+```java
+// Engine class
+class Engine {
+    void start() {
+        System.out.println("Engine starts");
+    }
+}
+
+// Car class
+class Car {
+    Engine engine = new Engine();
+
+    void drive() {
+        engine.start();
+        System.out.println("Car is moving");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car car = new Car();
+        car.drive();
+    }
+}
+```
+
+In this example, **Car HAS-A Engine**. The `Car` class does not inherit from `Engine`. Instead, it **uses** the `Engine` object to perform its function.
+
+---
+
+### 🧩 **HAS-A Relationship Diagram
+
+```
+     Car
+      |
+      |  HAS-A
+      ↓
+    Engine
+```
+
+This shows that the `Engine` is a **part** of the `Car`, but it is not a type of `Car`. This distinction is very important in OOP design.
+
+---
+
+## 🔴 14.3 - Key Differences Through Real-World Thinking
+
+To understand when to use IS-A or HAS-A, imagine the sentence you are forming:
+
+If the sentence sounds **natural and logical**, then the relationship is probably correct.
+
+- ✔ “A Dog is an Animal” → IS-A  
+- ❌ “A Dog is an Engine” → Incorrect  
+- ✔ “A Car has an Engine” → HAS-A  
+- ❌ “A Car is an Engine” → Incorrect  
+
+This thinking helps avoid common design mistakes made by beginners.
+
+---
+
+## 🔵 14.4 - Combining IS-A and HAS-A Together
+
+In real applications, we often use **both relationships together** to model complex systems.
+
+---
+
+### 🟣 **Combined Example**
+
+```java
+class Engine {
+    void start() {
+        System.out.println("Engine started");
+    }
+}
+
+class Vehicle {
+    void move() {
+        System.out.println("Vehicle moves");
+    }
+}
+
+class Car extends Vehicle {
+    Engine engine = new Engine();
+
+    void drive() {
+        engine.start();
+        move();
+        System.out.println("Car is driving");
+    }
+}
+```
+
+Here:
+- **Car IS-A Vehicle**
+- **Car HAS-A Engine**
+
+---
+
+### 🧠 Combined Relationship Diagram
+
+```
+          Vehicle
+             |
+             | IS-A
+             ↓
+            Car
+             |
+             | HAS-A
+             ↓
+           Engine
+```
+
+This structure is very common in real-world software like **banking systems, games, e-commerce apps, and operating systems**.
+
+## 🟢 14.5 - Why IS-A and HAS-A Relationships Matter
+
+Using the correct relationship makes your code:
+- Easier to read and understand
+- More reusable
+- Flexible to change
+- Closer to real-world thinking
+  
+---
+# 🔵 15 - Association in Java – Basic Relationship Between Objects
+
+Association is one of the simplest forms of relationship in Object-Oriented Programming. It represents a **"uses-a" or "has-a" relationship** between two classes. In this relationship, one object is connected to another object, but both objects can **exist independently** of each other.
+
+In simple terms, association means that two classes are related in some way, but neither class depends on the other for its lifecycle. For example, a **Teacher and Student** relationship is an association. A teacher can exist without a student, and a student can exist without a teacher.
+
+Let’s understand this with a simple example:
+
+```java
+class Teacher {
+    String name;
+
+    Teacher(String name) {
+        this.name = name;
+    }
+}
+
+class Student {
+    String name;
+    Teacher teacher; // Association
+
+    Student(String name, Teacher teacher) {
+        this.name = name;
+        this.teacher = teacher;
+    }
+
+    void display() {
+        System.out.println("Student: " + name);
+        System.out.println("Teacher: " + teacher.name);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Teacher t = new Teacher("Mr. John");
+        Student s = new Student("Rabbani", t);
+
+        s.display();
+    }
+}
+```
+
+In this example, the `Student` class is associated with the `Teacher` class. The student uses the teacher object, but both can exist independently. This is a **loose relationship**, and it is the foundation for more specific relationships like aggregation and composition.
+
+---
+
+## 🟣 15.1 - Aggregation in Java – Weak "Has-A" Relationship
+
+Aggregation is a special type of association that represents a **"has-a" relationship**, but with **weak ownership**. In aggregation, one class contains a reference to another class, but the contained object can still exist independently.
+
+This means that if the container object is destroyed, the contained object **will still exist**.
+
+A good real-world example is a **Department and Employee**. A department has employees, but employees can exist even if the department is deleted or changed.
+
+Let’s see an example:
+
+```java
+class Employee {
+    String name;
+
+    Employee(String name) {
+        this.name = name;
+    }
+}
+
+class Department {
+    String deptName;
+    Employee emp; // Aggregation
+
+    Department(String deptName, Employee emp) {
+        this.deptName = deptName;
+        this.emp = emp;
+    }
+
+    void display() {
+        System.out.println("Department: " + deptName);
+        System.out.println("Employee: " + emp.name);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Employee e = new Employee("Rabbani");
+        Department d = new Department("IT", e);
+
+        d.display();
+    }
+}
+```
+
+Here, the `Department` has an `Employee`, but the employee object exists independently. Even if the department object is removed, the employee still exists. This makes aggregation a **weak relationship**.
+
+---
+
+## 🟢 15.2 - Composition in Java – Strong "Has-A" Relationship
+
+Composition is a stronger form of aggregation. It represents a **"part-of" relationship**, where one object **cannot exist without the other**. In composition, the contained object’s lifecycle is completely dependent on the container object.
+
+In simple terms, if the parent object is destroyed, the child object is also destroyed.
+
+A common real-world example is a **House and Room**. A room cannot exist without a house.
+
+Let’s understand with code:
+
+```java
+class Engine {
+    void start() {
+        System.out.println("Engine started");
+    }
+}
+
+class Car {
+    private Engine engine; // Composition
+
+    Car() {
+        engine = new Engine(); // Engine created inside Car
+    }
+
+    void startCar() {
+        engine.start();
+        System.out.println("Car started");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car car = new Car();
+        car.startCar();
+    }
+}
+```
+
+In this example, the `Engine` object is created inside the `Car` class. There is no way to use the engine independently outside the car. If the car is destroyed, the engine also becomes useless. This makes composition a **strong relationship with tight coupling**.
+
+---
+
+## 🟡 15.3 Key Understanding – Association vs Aggregation vs Composition
+
+All three concepts represent relationships between classes, but they differ in **strength and dependency**.
+
+Association is the most basic relationship where objects are connected. Aggregation is a weaker "has-a" relationship in which objects can exist independently. Composition is a **strong "part-of" relationship** where the child object depends completely on the parent.
+
+In simple terms:
+
+* Association → Just a connection
+* Aggregation → Has-a (independent lifecycle)
+* Composition → Part-of (dependent lifecycle)
+
+---
+# 🔵 16 - Composition vs Inheritance – When to Choose What (Real Design Decision)
+
+In real-world system design, the key decision is not whether you *can* use inheritance, but whether you *should*. Inheritance should be used only when there is a true **IS-A relationship** that will remain stable over time—for example, a `SavingsAccount` **is a** `BankAccount`, and its behavior will always align with that abstraction. However, inheritance creates **tight coupling**, meaning changes in the parent class can unintentionally affect all child classes, making the system rigid and harder to evolve. This is why modern design prefers **composition (HAS-A relationship)** in most cases, where behavior is reused by **injecting dependencies instead of extending classes**. For example, instead of creating a `LoggingBase` class and making all services extend it, you design a separate `Logger` component and use it as a field inside your service. This keeps your service independent and flexible.
+
+```java
+// Composition (preferred)
+class Logger {
+    void log(String msg) {
+        System.out.println("LOG: " + msg);
+    }
+}
+
+class OrderService {
+    private Logger logger = new Logger(); // HAS-A relationship
+
+    void placeOrder() {
+        logger.log("Order placed");
+        System.out.println("Processing order");
+    }
+}
+```
+
+Here, `OrderService` does not depend on a base class, so you can change logging behavior, replace it, or even remove it without affecting the service logic. This flexibility is why **composition is preferred in most real projects**, especially in Spring Boot where dependencies are injected. The rule of thumb is simple: use inheritance only when the relationship is truly stable and represents a clear hierarchy, but prefer composition when you want **flexibility, testability, and loose coupling**, which is what modern scalable systems require.
+
+---
+# 🔵 17 - Introduction to Hiding in Java (Variable Hiding & Method Hiding)
+
+In Java, when **inheritance (IS-A relationship)** is used, a child class can define members (variables or methods) with the **same name** as those in the parent class. When this happens, the parent’s member becomes **hidden**. This concept is known as **hiding**.
+
+Hiding does **not** behave the same way for variables and methods, and this difference is extremely important for beginners to understand. Java handles **variables at compile time** and **methods at runtime**, which is the root cause of the confusion.
+
+We’ll explore **Variable Hiding** and **Method Hiding** separately, with code, execution flow, and diagrams.
+
+---
+
+## 🟢 17.1 - Variable Hiding in Java
+
+### 🔹 **What is Variable Hiding?**
+
+Variable hiding occurs when a **child class declares a variable with the same name** as a variable in its parent class. In this case, the child variable hides the parent variable.
+
+Java decides **which variable to access based on the reference type**, not the object type. This is known as **compile-time binding**.
+
+---
+
+### 🧠 **Variable Hiding Example**
+
+```java
+class Parent {
+    int value = 10;
+}
+
+class Child extends Parent {
+    int value = 20;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();
+        System.out.println(p.value);
+    }
+}
+```
+
+### 🔍 **Output**
+
+```
+10
+```
+
+Even though the object is of type `Child`, Java prints `10` because the **reference type is Parent**.
+
+---
+
+### 🧩 **Variable Resolution Flow**
+
+```
+Reference Type → Parent
+Object Type    → Child
+
+Java checks:
+Parent.value → FOUND
+Child.value  → IGNORED
+```
+
+---
+
+### 🔴 **Accessing Hidden Variables Using `super`**
+
+```java
+class Parent {
+    int value = 10;
+}
+
+class Child extends Parent {
+    int value = 20;
+
+    void display() {
+        System.out.println(value);        // Child variable
+        System.out.println(super.value);  // Parent variable
+    }
+}
+```
+
+Here:
+
+* `value` → Child class variable
+* `super.value` → Parent class variable
+
+---
+
+### 🧩 **Variable Hiding Diagram**
+
+```
+Child Object
+   |
+   |-- value = 20        ← Child variable
+   |
+   |-- super.value = 10  ← Parent variable
+```
+
+---
+
+## 🟠 17.2 - Method Hiding in Java
+
+### 🔹 **What is Method Hiding?**
+
+Method hiding occurs **only with static methods**. When a child class defines a **static method with the same signature** as a static method in the parent class, the parent method is hidden, not overridden.
+
+Unlike overridden methods, hidden methods are resolved at **compile time**, based on the **reference type**.
+
+---
+
+### 🧠 **Method Hiding Example (Static Methods)**
+
+```java
+class Parent {
+    static void show() {
+        System.out.println("Parent show()");
+    }
+}
+
+class Child extends Parent {
+    static void show() {
+        System.out.println("Child show()");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();
+        p.show();
+    }
+}
+```
+
+### 🔍 **Output**
+
+```
+Parent show()
+```
+
+Even though the object is of `Child`, Java calls `Parent.show()` because **static methods do not support runtime polymorphism**.
+
+---
+
+### 🧩 Method Hiding Resolution Flow
+
+```
+Reference Type → Parent
+Method Call    → show()
+
+Java checks:
+Parent.show() → CALLED
+Child.show()  → IGNORED
+```
+
+---
+
+## 🔴 17.3 - Method Overriding vs Method Hiding (Critical Difference)
+
+### 🔹 Method Overriding (Instance Methods)
+
+```java
+class Parent {
+    void display() {
+        System.out.println("Parent display()");
+    }
+}
+
+class Child extends Parent {
+    void display() {
+        System.out.println("Child display()");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();
+        p.display();
+    }
+}
+```
+
+### 🔍 **Output**
+
+```
+Child display()
+```
+
+Here, **runtime polymorphism** applies, and Java uses the **object type**, not the reference type.
+
+---
+
+### 🧠 **Key Rule**
+
+* **Static methods → Method Hiding**
+* **Non-static methods → Method Overriding**
+
+---
+
+## 🟣 17.4 - Why Static Methods Cannot Be Overridden
+
+Static methods belong to the **class**, not to the object. Since polymorphism works with objects, static methods **cannot participate** in runtime binding.
+
+That’s why Java treats same-named static methods as **method hiding**, not overriding.
+
+---
+
+### 🧩 Static vs Instance Method Flow
+
+```
+Instance Method Call
+--------------------
+Reference → Object → Runtime → Child method
+
+Static Method Call
+------------------
+Reference → Compile Time → Parent method
+```
+
+---
+
+## 🔵 17.5 - Common Beginner Mistakes
+
+Many beginners assume:
+
+* Variables behave like methods ❌
+* Static methods can be overridden ❌
+
+Java keeps these rules strict to avoid ambiguity and performance issues.
+
+---
+
+## 🟢 17.6 - Final Combined Diagram
+
+```
+                 Parent Class
+           -------------------------
+           variable  static method
+           instance method
+                   ↑
+                   |
+           -------------------------
+                 Child Class
+           variable  static method
+           instance method
+```
+
+* Variables → **Hidden**
+* Static methods → **Hidden**
+* Instance methods → **Overridden**
 
 ---
