@@ -18,12 +18,12 @@
   - [🔵 11. Access Modifiers in Java](#-11---access-modifiers-in-java--controlling-visibility-encapsulation--inheritance)
 ---
 # Part 4: Core OOP Pillar – Inheritance
-- 12 - DRY Principle 
-- 13- Inheritance (What, Syntax, Types) 
-- 14 - IS-A and HAS-A Relationships
-- 15 - Association, Aggregation, Composition 
-- 16 - Composition vs Inheritance 
-- 17 - Variable Hiding & Method Hiding 
+  - [🔵 12. DRY Principle](#-12---what-is-dry-dont-repeat-yourself)
+  - [🟠 13. Inheritance (What, Syntax, Types)](#-13---what-is-inheritance-in-java)
+  - [🟢 14. IS-A and HAS-A Relationships](#-14---understanding-is-a-and-has-a-relationships-in-object-oriented-programming)
+  - [🔴 15. Association, Aggregation, Composition](#-15---association-in-java--basic-relationship-between-objects)
+  - [🔵 16. Composition vs Inheritance](#-16---composition-vs-inheritance--when-to-choose-what-real-design-decision)
+  - [🟡 17. Variable Hiding & Method Hiding](#-17---introduction-to-hiding-in-java-variable-hiding--method-hiding)
 
 ---
 
