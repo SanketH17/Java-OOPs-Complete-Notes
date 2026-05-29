@@ -50,7 +50,11 @@
   - [🔴 32. Inner Classes & Anonymous Classes](#-32---inner-classes--anonymous-classes-in-java--deep-oop-understanding)
 
 ---
+# Part 8: Advanced Design Principles
+  - [🔵 33. SOLID Principles](#-33---solid-principles-in-java--real-oop-design-for-experienced-developers-25-years-level)
+  - [🔵 34. Immutability](#-34---immutability-in-java--designing-thread-safe-objects-real-interview-concept)
 
+---
 
 ## 🟢 1. What is a Class in Java?
 
@@ -5174,5 +5178,472 @@ This concept is important because:
 * Used in frameworks and event handling
 
 ---
+# 🔵 33 - SOLID Principles in Java – Real OOP Design for Experienced Developers (2–5 Years Level)
 
+SOLID principles are a set of five design principles that help you write **clean, maintainable, scalable, and loosely coupled code**. These are not just theoretical concepts—interviewers expect you to **connect them with real project experience**, especially if you have worked on systems like Angular + Spring Boot (like your Nissan/Tech Mahindra work).
+
+Each principle focuses on reducing complexity and improving design quality. Let’s understand them deeply with practical intuition and code.
+
+---
+
+# 🟣 1️⃣ SRP – Single Responsibility Principle (One Class, One Reason to Change)
+
+The Single Responsibility Principle states that a class should have **only one responsibility**, meaning it should have **only one reason to change**.
+
+In real projects, this becomes very important. For example, if you combine business logic, database operations, and logging in one class, then any small change can affect everything. This makes the code hard to maintain.
+
+Let’s see a bad design:
+
+```java
+class UserService {
+    void saveUser() {
+        // business logic
+        System.out.println("Saving user");
+
+        // database logic
+        System.out.println("Saving to DB");
+
+        // logging
+        System.out.println("Logging info");
+    }
+}
+```
+
+Here, one class is doing multiple things.
+
+Now applying SRP:
+
+```java
+class UserService {
+    void processUser() {
+        System.out.println("Processing user");
+    }
+}
+
+class UserRepository {
+    void saveToDB() {
+        System.out.println("Saving to DB");
+    }
+}
+
+class LoggerService {
+    void log(String message) {
+        System.out.println(message);
+    }
+}
+```
+
+Now each class has a **single responsibility**.
+
+👉 In your project:
+
+* Angular component → UI logic
+* Service → business logic
+* Repository → DB interaction
+
+This separation is SRP in action.
+
+---
+
+# 🟢 2️⃣ OCP – Open/Closed Principle (Open for Extension, Closed for Modification)
+
+The Open/Closed Principle states that a class should be:
+👉 **Open for extension, but closed for modification**
+
+This means you should be able to add new functionality **without modifying existing code**.
+
+Bad example:
+
+```java
+class PaymentService {
+    void pay(String type) {
+        if (type.equals("UPI")) {
+            System.out.println("UPI payment");
+        } else if (type.equals("CARD")) {
+            System.out.println("Card payment");
+        }
+    }
+}
+```
+
+If a new payment type comes → you must modify this class ❌
+
+Now applying OCP:
+
+```java
+interface Payment {
+    void pay();
+}
+
+class UPI implements Payment {
+    public void pay() {
+        System.out.println("UPI payment");
+    }
+}
+
+class Card implements Payment {
+    public void pay() {
+        System.out.println("Card payment");
+    }
+}
+
+class PaymentService {
+    void process(Payment payment) {
+        payment.pay();
+    }
+}
+```
+
+Now you can add new payment types **without modifying existing code**.
+
+👉 In your project:
+
+* Adding new APIs or features without changing existing services
+* Using interfaces + new implementations
+
+---
+
+# 🟡 3️⃣ LSP – Liskov Substitution Principle (Replace Parent with Child Safely)
+
+LSP states that a **child class should be usable wherever the parent class is expected**, without breaking the program.
+
+This means inheritance should not change expected behavior.
+
+Bad example:
+
+```java
+class Bird {
+    void fly() {
+        System.out.println("Flying");
+    }
+}
+
+class Penguin extends Bird {
+    void fly() {
+        throw new RuntimeException("Cannot fly");
+    }
+}
+```
+
+Here, substituting Penguin breaks the program ❌
+
+Better design:
+
+```java
+class Bird {
+}
+
+interface Flyable {
+    void fly();
+}
+
+class Sparrow extends Bird implements Flyable {
+    public void fly() {
+        System.out.println("Flying");
+    }
+}
+
+class Penguin extends Bird {
+}
+```
+
+👉 Now substitution is safe.
+
+👉 In your experience:
+
+* If subclass changes behavior unexpectedly → violates LSP
+* Covariant return types also relate to safe substitution
+
+---
+
+# 🔴 4️⃣ ISP – Interface Segregation Principle (Avoid Fat Interfaces)
+
+ISP says:
+👉 Do not force a class to implement methods it does not need
+
+Bad example:
+
+```java
+interface Worker {
+    void work();
+    void eat();
+}
+
+class Robot implements Worker {
+    public void work() {
+        System.out.println("Working");
+    }
+
+    public void eat() {
+        // ❌ Not applicable
+    }
+}
+```
+
+Robot is forced to implement unnecessary method ❌
+
+Better design:
+
+```java
+interface Workable {
+    void work();
+}
+
+interface Eatable {
+    void eat();
+}
+
+class Human implements Workable, Eatable {
+    public void work() { }
+    public void eat() { }
+}
+
+class Robot implements Workable {
+    public void work() { }
+}
+```
+
+👉 In your project:
+
+* Avoid large service interfaces
+* Split into smaller focused interfaces
+
+---
+
+# 🔵 5️⃣ DIP – Dependency Inversion Principle (Depend on Abstractions)
+
+DIP states:
+👉 High-level modules should not depend on low-level modules
+👉 Both should depend on abstractions
+
+This is directly connected to **Dependency Injection (DI)**.
+
+Bad example:
+
+```java
+class MySQLDatabase {
+    void connect() {
+        System.out.println("Connected to MySQL");
+    }
+}
+
+class UserService {
+    private MySQLDatabase db = new MySQLDatabase();
+}
+```
+
+Here, UserService is tightly coupled ❌
+
+Better design:
+
+```java
+interface Database {
+    void connect();
+}
+
+class MySQLDatabase implements Database {
+    public void connect() {
+        System.out.println("MySQL connected");
+    }
+}
+
+class UserService {
+    private Database db;
+
+    UserService(Database db) {
+        this.db = db;
+    }
+}
+```
+
+👉 Now UserService depends on abstraction, not implementation
+
+---
+
+### 🔹 Spring Boot Real Example (Your Stack)
+
+```java
+@Autowired
+private UserRepository userRepository;
+```
+
+Here:
+
+* You depend on interface
+* Spring injects implementation
+
+👉 This is **DIP in real life**
+
+---
+
+# 🟣 6️⃣ Real Interview Insight (Very Important)
+
+When answering in interview, don’t just define—connect:
+
+* SRP → separate Angular components/services
+* OCP → add new features without modifying existing APIs
+* LSP → proper inheritance design
+* ISP → smaller interfaces in services
+* DIP → Spring @Autowired + interfaces
+
+---
+# 🔵 34 - Immutability in Java – Designing Thread-Safe Objects (Real Interview Concept)
+
+Immutability means that **once an object is created, its state cannot be changed**. This concept is extremely important in Java because immutable objects are **thread-safe by default**, easy to reason about, and widely used in real-world systems (for example, `String`).
+
+In simple terms, an immutable object behaves like a **read-only value**. Once created, no one can modify it—only create a new object if changes are needed. This makes it very powerful in **multi-threaded environments**, which is why companies like Citibank focus on this concept.
+
+---
+
+# 🟣 **2️⃣ Why Immutability is Important (Real-World Understanding)**
+
+In real systems, multiple threads may access the same object at the same time. If the object is mutable, one thread might change it while another is reading it, leading to inconsistent data.
+
+Immutable objects solve this problem because:
+
+* Their state never changes
+* No synchronization is required
+* They are inherently thread-safe
+
+This is why classes like `String`, `Integer`, etc., are immutable.
+
+---
+
+# 🟢 **3️⃣ Rules to Create an Immutable Class (Core Design Recipe)**
+
+To design an immutable class, you must follow strict rules:
+
+* Declare the class as `final` → prevents inheritance
+* Make all fields `private final` → cannot be modified
+* Initialize fields through constructor
+* Do not provide setter methods
+* Return **defensive copies** for mutable objects
+
+Let’s implement a complete example.
+
+---
+
+# 🟡 **4️⃣ Example – Building an Immutable Class**
+
+```java
+final class Person {
+
+    private final String name;
+    private final int age;
+    private final java.util.Date dob; // mutable object
+
+    // Constructor initializes all fields
+    public Person(String name, int age, java.util.Date dob) {
+        this.name = name;
+        this.age = age;
+        // Defensive copy
+        this.dob = new java.util.Date(dob.getTime());
+    }
+
+    // Getters only (no setters)
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    // Return defensive copy to prevent modification
+    public java.util.Date getDob() {
+        return new java.util.Date(dob.getTime());
+    }
+}
+```
+
+---
+
+## 🔴 **5️⃣ Why Defensive Copy is Important (Critical Concept)**
+
+Even if fields are `final`, if they refer to **mutable objects**, the internal state can still be changed.
+
+Bad example:
+
+```java
+public java.util.Date getDob() {
+    return dob; // ❌ exposing internal object
+}
+```
+
+Someone can do:
+
+```java
+person.getDob().setTime(0); // modifies internal state ❌
+```
+
+👉 This breaks immutability.
+
+Correct approach:
+
+```java
+return new Date(dob.getTime()); // ✔️ safe copy
+```
+
+Now external code cannot affect internal state.
+
+---
+
+# 🔵 **6️⃣ How Immutability Ensures Thread Safety**
+
+Because immutable objects:
+
+* Cannot change after creation
+* Do not share mutable state
+* Do not require locks
+
+Multiple threads can safely access them without synchronization.
+
+Example:
+
+```java
+String s = "Rabbani"; // immutable
+```
+
+Even if 100 threads use it, it remains unchanged.
+
+---
+
+# 🟣 **7️⃣ Real-World Usage in Your Projects**
+
+In real Spring Boot applications, immutability is used in:
+
+* DTOs (Data Transfer Objects)
+* Configuration classes
+* Response objects
+* Caching systems
+
+For example:
+
+```java
+final class UserDTO {
+    private final String name;
+    private final int age;
+
+    public UserDTO(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+👉 No setters → safe to share across threads
+
+---
+
+# 🟢 **8️⃣ Interview-Level Answer (How You Should Explain)**
+
+If asked:
+
+👉 “How would you design an immutable class?”
+
+You should say naturally:
+
+> To create an immutable class, I make the class final, declare all fields as private final, initialize them through the constructor, and avoid setters. If the class contains mutable objects, I return defensive copies to prevent external modification. This ensures the object is thread-safe and cannot be changed after creation.
+
+---
 
