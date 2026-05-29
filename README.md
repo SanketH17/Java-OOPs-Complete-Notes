@@ -40,6 +40,16 @@
   - [🔵 25. Marker Interfaces](#-25---marker-interfaces-in-java--signaling-behavior-without-methods)
 
 ---
+# Part 7: Important Keywords & Special Concepts
+  - [🔵 26. Static Keyword](#-26---static-keyword-in-java--understanding-class-level-behavior)
+  - [🟠 27. Final Keyword](#-27---final-keyword-in-java--controlling-behavior-in-oop)
+  - [🟢 28. Object Class](#-28---object-class-in-java--root-of-all-classes)
+  - [🔴 29. Wrapper Classes & Autoboxing](#-29---wrapper-classes-in-java--converting-primitive-types-into-objects)
+  - [🟡 30. Enum in Java](#-30---enum-in-java--an-oop-perspective-more-than-just-constants)
+  - [🔷 31. Object Cloning](#-31---object-cloning-in-java)
+  - [🔴 32. Inner Classes & Anonymous Classes](#-32---inner-classes--anonymous-classes-in-java--deep-oop-understanding)
+
+---
 
 
 ## 🟢 1. What is a Class in Java?
@@ -3681,3 +3691,1488 @@ Marker interfaces help in:
 * Integrating with JVM-level operations
 
 ---
+# 🔵 26 - Static Keyword in Java – Understanding Class-Level Behavior
+
+The `static` keyword in Java is used to define members that belong to the **class itself rather than to individual objects**. This creates a major behavioral difference in how data and methods are stored and accessed.
+
+In simple terms, when something is declared as `static`, it is **shared across all objects of that class**. Instead of each object having its own copy, there is only **one common copy in memory**.
+
+This makes static members useful for:
+
+* Shared data
+* Utility methods
+* One-time initialization
+
+---
+
+## 🟣 26.1 - Static Variable – Shared Data Across Objects
+
+A static variable is also known as a **class variable**. It is stored in the **Method Area (Metaspace)** and shared among all instances of the class.
+
+Let’s understand this with an example:
+
+```java
+class Student {
+    int id;
+    String name;
+
+    static String college = "ABC College"; // static variable
+
+    Student(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    void display() {
+        System.out.println(id + " " + name + " " + college);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s1 = new Student(1, "Rabbani");
+        Student s2 = new Student(2, "John");
+
+        s1.display();
+        s2.display();
+    }
+}
+```
+
+Here, both `s1` and `s2` share the same `college` value. If we change it once, it affects all objects.
+
+👉 Important idea:
+
+* Only **one copy** exists
+* Shared across all objects
+
+---
+
+## 🟢 26.2 - Static Method – Class-Level Behavior
+
+A static method belongs to the class, not the object. It can be called **without creating an object**.
+
+```java
+class Utility {
+
+    static void printMessage() {
+        System.out.println("Hello from static method");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Utility.printMessage(); // no object needed
+    }
+}
+```
+
+---
+
+### 🔹 Important Rules of Static Methods
+
+Inside a static method:
+
+* You can access **only static variables/methods directly**
+* You cannot access non-static members without creating an object
+
+```java
+class Test {
+    int x = 10;
+    static int y = 20;
+
+    static void display() {
+        // System.out.println(x); ❌ not allowed
+        System.out.println(y); // allowed
+    }
+}
+```
+
+👉 Reason:
+Static methods don’t belong to any specific object, so they cannot directly access instance data.
+
+---
+
+## 🟡 26.3 - Static Block – One-Time Initialization
+
+A static block is used for **initializing static variables**. It runs **only once when the class is loaded into memory**, before the `main()` method.
+
+```java
+class Demo {
+    static int x;
+
+    static {
+        x = 100;
+        System.out.println("Static block executed");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Demo.x);
+    }
+}
+```
+
+Output:
+
+```
+Static block executed
+100
+```
+
+👉 Important:
+
+* Executes only once
+* Runs before main()
+* Used for heavy initialization
+
+---
+
+## 🔴 26.4 - Method Hiding vs Method Overriding (Static Connection)
+
+This is where `static` becomes very important in OOP behavior.
+
+### 🔹 Method Overriding (Non-Static Methods)
+
+When a child class provides a new implementation of a parent class method → **runtime polymorphism**
+
+```java
+class Parent {
+    void show() {
+        System.out.println("Parent method");
+    }
+}
+
+class Child extends Parent {
+    void show() {
+        System.out.println("Child method");
+    }
+}
+```
+
+👉 This is **overriding**
+👉 Decided at runtime
+
+---
+
+### 🔹 Method Hiding (Static Methods)
+
+Static methods cannot be overridden. Instead, they are **hidden**.
+
+```java
+class Parent {
+    static void show() {
+        System.out.println("Parent static method");
+    }
+}
+
+class Child extends Parent {
+    static void show() {
+        System.out.println("Child static method");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent obj = new Child();
+        obj.show();
+    }
+}
+```
+
+Output:
+
+```
+Parent static method
+```
+
+👉 Why?
+
+Because static methods are resolved at **compile time**, based on reference type, not object type.
+
+---
+
+## 🔵 26.5 - Key Difference – Static vs Non-Static Behavior
+
+* Static → belongs to class, shared, compile-time binding
+* Non-static → belongs to object, separate copies, runtime binding
+
+This difference is crucial in understanding **method hiding vs overriding**.
+
+---
+
+## 🟣 26.6 - Real-World Understanding
+
+Think of static like **common resources in an office**:
+
+* Static variable → Company name shared by all employees
+* Static method → Common utility tool (like calculator)
+* Static block → Company setup done once at startup
+
+While non-static members are like **personal data of employees**.
+
+---
+
+## 🟢 26.7 - Why `static` is Important
+
+The `static` keyword helps in:
+
+* Reducing memory usage (shared data)
+* Creating utility/helper methods
+* Controlling initialization flow
+* Understanding compile-time vs runtime behavior
+
+---
+# 🔵 27 - Final Keyword in Java – Controlling Behavior in OOP
+
+The `final` keyword in Java is used to **restrict modification**. It is a very important concept in Object-Oriented Programming because it helps you **control how variables, methods, and classes behave**, making your code more secure and predictable.
+
+When you use `final`, you are telling the compiler:
+👉 “This should not be changed further.”
+
+The `final` keyword can be applied in three main places:
+
+* Variables
+* Methods
+* Classes
+
+Each one has a different purpose, and understanding them clearly is very important for interviews and real-world coding.
+
+---
+
+## 🟣 27.1 - Final Variable – Constant Value
+
+When a variable is declared as `final`, its value **cannot be changed once it is assigned**. It becomes a constant.
+
+This is useful when you want to define values that should remain fixed throughout the program, like configuration values or constants.
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        final int x = 10;
+
+        // x = 20; ❌ Error: cannot change final variable
+
+        System.out.println(x);
+    }
+}
+```
+
+Here, once `x` is assigned the value `10`, it cannot be modified.
+
+If you declare a final variable without assigning a value, you must initialize it later **only once**:
+
+```java
+final int y;
+y = 50; // allowed once
+```
+
+---
+
+### 🔹 Final Reference Variable (Important Insight)
+
+When you use `final` with objects, the reference cannot change, but the object’s internal state can still be modified.
+
+```java
+class Person {
+    int age;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        final Person p = new Person();
+        p.age = 25; // allowed
+
+        // p = new Person(); ❌ not allowed
+    }
+}
+```
+
+👉 Important:
+
+* Reference cannot change ❌
+* Object data can change ✔️
+
+---
+
+## 🟢 27.2 - Final Method – Prevent Method Overriding
+
+When a method is declared as `final`, it **cannot be overridden by subclasses**. This is useful when you want to ensure that a method’s behavior remains unchanged in child classes.
+
+```java
+class Parent {
+    final void display() {
+        System.out.println("Final method in Parent");
+    }
+}
+
+class Child extends Parent {
+    // void display() { } ❌ Error: cannot override final method
+}
+```
+
+Here, the `display()` method is fixed and cannot be modified in the child class.
+
+👉 This helps in:
+
+* Maintaining consistent behavior
+* Preventing accidental changes
+* Securing critical logic
+
+---
+
+## 🔴 27.3 - Final Class – Prevent Inheritance
+
+When a class is declared as `final`, it **cannot be extended (inherited)**. This means no other class can become its child.
+
+```java
+final class Animal {
+}
+
+// class Dog extends Animal { } ❌ Error: cannot inherit final class
+```
+
+A common real-world example is the `String` class in Java, which is declared as final to prevent modification and ensure immutability.
+
+👉 This is useful when:
+
+* You want to prevent inheritance
+* You want to make a class immutable
+* You want to ensure security and stability
+
+---
+
+## 🟡 27.4 - Combining Everything – Clear Understanding
+
+Let’s look at a combined example:
+
+```java
+final class A {
+    final int x = 10;
+
+    final void show() {
+        System.out.println("Value: " + x);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        A obj = new A();
+        obj.show();
+    }
+}
+```
+
+Here:
+
+* Class `A` cannot be extended
+* Variable `x` cannot be changed
+* Method `show()` cannot be overridden
+
+This ensures complete control over the behavior.
+
+---
+
+## 🔵 27.5 - Real-World Understanding
+
+Think of `final` like **rules that cannot be broken** 🚫:
+
+* Final variable → Fixed value (like a constant price tag)
+* Final method → Fixed behavior (cannot be modified)
+* Final class → Closed for extension (no inheritance allowed)
+
+---
+
+## 🟣 27.6 - Why Final Keyword is Important
+
+The `final` keyword helps you write **safe, predictable, and maintainable code**. It ensures that critical parts of your program are not accidentally modified or overridden.
+
+It is widely used in:
+
+* Constants (`final static`)
+* Immutable classes
+* Security-sensitive logic
+* Framework design
+
+---
+# 🔵 28 - Object Class in Java – Root of All Classes
+
+In Java, the **Object class** is the most fundamental because **every class in Java directly or indirectly inherits from it**. This means that no matter what class you create—whether it is a simple class like `Student` or a complex class in a framework—it automatically becomes a child of the Object class.
+
+The Object class is part of the `java.lang` package, which is imported by default in every Java program. Because of this, you don’t need to explicitly import it. The Object class provides a set of common methods that can be used by all Java objects, such as comparison, cloning, string representation, and thread handling.
+
+In simple terms, the Object class acts like a **universal parent** that provides basic behavior to all Java objects.
+
+---
+
+## 🟣 28.1 - How Object Class is Inherited Automatically
+
+Even if you do not explicitly extend any class, Java internally makes your class extend the Object class.
+
+For example:
+
+```java
+class Student {
+}
+```
+
+Internally, Java treats it like:
+
+```java
+class Student extends Object {
+}
+```
+
+This means every object you create has access to methods defined in the Object class. That is why you can call methods like `toString()` or `equals()` on any object.
+
+---
+
+## 🟢 28.2 - Important Methods of Object Class
+The Object class provides several important methods that are commonly used in Java applications. These methods are either used directly or overridden to provide custom behavior.
+
+
+### 🔹 **toString() – String Representation of Object**
+
+The `toString()` method returns a string representation of the object. By default, it prints the class name followed by the hashcode.
+
+```java
+class Student {
+    int id = 101;
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s = new Student();
+        System.out.println(s.toString());
+    }
+}
+```
+
+Default output looks like:
+
+```
+Student@1b6d3586
+```
+
+We can override it to make it more meaningful:
+
+```java
+class Student {
+    int id = 101;
+
+    public String toString() {
+        return "Student ID: " + id;
+    }
+}
+```
+
+Now the output will be:
+
+```
+Student ID: 101
+```
+
+---
+
+### 🔹 **equals() – Comparing Objects**
+
+The `equals()` method is used to compare two objects. By default, it compares **memory addresses**, not actual content.
+
+```java
+class Student {
+    int id;
+
+    Student(int id) {
+        this.id = id;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Student s1 = new Student(1);
+        Student s2 = new Student(1);
+
+        System.out.println(s1.equals(s2)); // false
+    }
+}
+```
+
+Even though values are the same, it returns false because they are different objects.
+
+To compare values, we override `equals()`:
+
+```java
+@Override
+public boolean equals(Object obj) {
+    Student s = (Student) obj;
+    return this.id == s.id;
+}
+```
+
+---
+
+### 🔹 **hashCode() – Unique Identifier for Objects**
+
+The `hashCode()` method returns an integer value representing the object. It is mainly used in **HashMap, HashSet**, etc.
+
+Important rule:
+👉 If two objects are equal (equals returns true), their hashCode must also be equal.
+
+```java
+@Override
+public int hashCode() {
+    return id;
+}
+```
+
+---
+
+### 🔹 **clone() – Object Copying**
+
+The `clone()` method is used to create a copy of an object. It performs a **shallow copy** by default.
+
+```java
+class Student implements Cloneable {
+    int id = 101;
+
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+}
+```
+
+---
+
+### 🔹 **finalize() – Garbage Collection Hook (Deprecated)**
+
+The `finalize()` method is called by the Garbage Collector before destroying an object. However, it is now **deprecated** and should not be used.
+
+---
+
+### 🔹 **wait(), notify(), notifyAll() – Thread Communication**
+
+These methods are used in **multithreading** for communication between threads.
+
+```java
+synchronized(obj) {
+    obj.wait();
+    obj.notify();
+}
+```
+
+They help in controlling thread execution.
+
+---
+
+## 🟡 28.3 - Real Example – Understanding Object Class Usage
+
+```java
+class Person {
+    int age;
+
+    Person(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "Age: " + age;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Person p = (Person) obj;
+        return this.age == p.age;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Person p1 = new Person(25);
+        Person p2 = new Person(25);
+
+        System.out.println(p1);              // calls toString()
+        System.out.println(p1.equals(p2));  // true
+    }
+}
+```
+
+Here, we override `toString()` and `equals()` to provide meaningful behavior instead of default behavior.
+
+---
+
+## 🔴 28.4 - Why Object Class is Important
+
+The Object class is important because it provides **common functionality to all objects**, ensuring consistency across Java applications. It allows developers to:
+
+* Compare objects
+* Convert objects to strings
+* Manage memory and cloning
+* Handle multithreading
+
+Without the Object class, Java would not have a unified way to treat all objects.
+
+---
+# 🔵 29 - Wrapper Classes in Java – Converting Primitive Types into Objects
+
+In Java, primitive data types like `int`, `double`, `char`, and `boolean` are **not objects**. They are simple values stored directly in memory, which makes them fast but limited in functionality. However, many parts of Java, especially collections like `ArrayList`, work only with **objects**.
+
+To solve this problem, Java provides **Wrapper Classes**, which convert primitive types into objects. Each primitive type has a corresponding wrapper class:
+
+* `int` → `Integer`
+* `double` → `Double`
+* `char` → `Character`
+* `boolean` → `Boolean`
+
+These wrapper classes are part of the `java.lang` package and allow primitives to behave like objects.
+
+---
+
+## 🟣 29.1 - Why Wrapper Classes Are Needed – Real Understanding
+
+Primitive types are fast and efficient, but they cannot be used in situations where Java expects **objects**.
+
+For example, collections like `ArrayList` cannot store primitive values directly:
+
+```java
+// ❌ Not allowed
+// ArrayList<int> list = new ArrayList<>();
+```
+
+Instead, we use wrapper classes:
+
+```java
+import java.util.ArrayList;
+
+public class Main {
+    public static void main(String[] args) {
+        ArrayList<Integer> list = new ArrayList<>();
+
+        list.add(10);
+        list.add(20);
+
+        System.out.println(list);
+    }
+}
+```
+
+Here, `Integer` allows us to store `int` values inside a collection.
+
+Wrapper classes also provide useful methods like:
+
+* Parsing (`Integer.parseInt()`)
+* Conversions
+* Utility methods
+
+---
+
+## 🟢 29.2 - Autoboxing – Primitive to Object Conversion (Automatic)
+
+Autoboxing is the process where Java automatically converts a **primitive type into its corresponding wrapper object**.
+
+Before Java 5, this had to be done manually:
+
+```java
+Integer num = Integer.valueOf(10); // manual boxing
+```
+
+With autoboxing:
+
+```java
+Integer num = 10; // automatic conversion
+```
+
+👉 Java internally converts `10` into `Integer.valueOf(10)`
+
+Let’s see a full example:
+
+```java id="czb8r7"
+public class Main {
+    public static void main(String[] args) {
+        Integer num = 100; // autoboxing
+
+        System.out.println(num);
+    }
+}
+```
+
+Here, the primitive `100` is automatically wrapped into an `Integer` object.
+
+---
+
+## 🟡 29.3 - Unboxing – Object to Primitive Conversion
+
+Unboxing is the reverse process, where a wrapper object is converted back into a primitive type.
+
+```java id="sjtyc9"
+public class Main {
+    public static void main(String[] args) {
+        Integer num = 50;
+
+        int value = num; // unboxing
+
+        System.out.println(value);
+    }
+}
+```
+
+👉 Java internally calls:
+
+```java
+num.intValue();
+```
+
+This makes working with primitives and objects seamless.
+
+---
+
+## 🔴 29.4 - How Autoboxing Works Internally
+
+When you write:
+
+```java
+Integer num = 10;
+```
+
+Java internally does:
+
+```java
+Integer num = Integer.valueOf(10);
+```
+
+Similarly, for unboxing:
+
+```java
+int value = num;
+```
+
+Java converts it to:
+
+```java
+int value = num.intValue();
+```
+
+👉 This automatic conversion reduces boilerplate code and improves readability.
+
+---
+
+## 🔵 29.5 - Important Behavior – Wrapper Caching (Integer Cache)
+
+Java optimizes memory using **caching for wrapper objects**, especially for `Integer`.
+
+For values between **-128 to 127**, Java reuses objects instead of creating new ones.
+
+```java id="bhtq9h"
+public class Main {
+    public static void main(String[] args) {
+        Integer a = 100;
+        Integer b = 100;
+
+        System.out.println(a == b); // true (same object)
+
+        Integer x = 200;
+        Integer y = 200;
+
+        System.out.println(x == y); // false (different objects)
+    }
+}
+```
+
+👉 Important:
+
+* `==` compares references
+* `.equals()` compares values
+
+---
+
+## 🟣 29.6 - Common Pitfall – NullPointerException in Unboxing
+
+One important issue with wrapper classes is that they can be `null`.
+
+```java id="wmf50f"
+public class Main {
+    public static void main(String[] args) {
+        Integer num = null;
+
+        int value = num; // ❌ NullPointerException
+    }
+}
+```
+
+👉 Why?
+Because Java tries to call `num.intValue()`, but `num` is `null`.
+
+---
+
+## 🟢 29.7 - Real-World Understanding
+
+Think of wrapper classes like **gift boxes 🎁**:
+
+* Primitive → raw value (no extra features)
+* Wrapper → value inside a box with extra functionality
+
+Autoboxing = putting value into the box automatically
+Unboxing = taking value out of the box
+
+---
+
+## 🟡 29.8 - Why Wrapper Classes + Autoboxing Are Important
+
+They are essential because:
+
+* Collections require objects
+* Provide utility methods
+* Enable seamless conversion
+* Simplify code with autoboxing/unboxing
+
+---
+# 🔵 30 - Enum in Java – An OOP Perspective (More Than Just Constants)
+
+In Java, an **enum (enumeration)** is not just a list of constants—it is actually a **full-fledged class**. This means an enum can have **fields, constructors, and methods**, just like any other class. The only difference is that enums are designed to represent a **fixed set of constants**, such as days of the week, directions, or states.
+
+From an Object-Oriented Programming perspective, enums provide a **type-safe way to define a group of related constants**, while still allowing behavior to be attached to them.
+
+Let’s start with a simple enum:
+
+```java
+enum Day {
+    MONDAY, TUESDAY, WEDNESDAY
+}
+```
+
+At first glance, it looks like just constants. But internally, each constant is actually an **object of the enum class**.
+
+---
+
+## 🟣 30.1 - Enums Are Full Classes – Fields, Methods, Constructors
+
+Since enums are classes, we can add fields, constructors, and methods to them.
+
+```java
+enum Day {
+    MONDAY("Start of week"),
+    TUESDAY("Second day"),
+    WEDNESDAY("Mid week");
+
+    private String description;
+
+    // Constructor (always private or default)
+    Day(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Day d = Day.MONDAY;
+        System.out.println(d.getDescription());
+    }
+}
+```
+
+Here:
+
+* Each enum constant has its own data
+* Constructor initializes values
+* Method provides behavior
+
+👉 This clearly shows enums behave like **objects with state and behavior**
+
+---
+
+## 🟢 30.2 - Enum Constructor Rules (Important)
+
+Enum constructors are **always private (or default)**. You cannot make them public or protected.
+
+👉 Why?
+
+Because enum objects are created **only by the JVM**, not by developers. This ensures:
+
+* Fixed number of instances
+* No duplicate objects
+
+You cannot do this:
+
+```java
+// ❌ Not allowed
+Day d = new Day("Test");
+```
+
+---
+
+## 🟡 30.3 - Can Enum Implement Interface? (Interview Question ✅)
+
+👉 **Yes, enums can implement interfaces.**
+
+This is very useful when you want enums to follow a contract.
+
+```java
+interface Operation {
+    int apply(int a, int b);
+}
+
+enum Calculator implements Operation {
+    ADD {
+        public int apply(int a, int b) {
+            return a + b;
+        }
+    },
+    MULTIPLY {
+        public int apply(int a, int b) {
+            return a * b;
+        }
+    };
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println(Calculator.ADD.apply(5, 3));
+    }
+}
+```
+
+Here, each enum constant provides its own implementation.
+
+👉 This is **polymorphism using enums**.
+
+---
+
+## 🔴 30.4 - Can Enum Extend a Class? (Interview Question ❌)
+
+👉 **No, enums cannot extend any class.**
+
+Reason:
+Every enum **implicitly extends `java.lang.Enum`**, so Java does not allow multiple inheritance.
+
+```java
+// Internally
+enum Day extends java.lang.Enum<Day>
+```
+
+👉 But enums can still:
+
+* Implement interfaces ✔️
+* Have methods ✔️
+* Override behavior ✔️
+
+---
+
+## 🔵 30.5 - values() and valueOf() – Auto-Generated Methods
+
+Java automatically provides some useful methods for enums:
+
+### 🔹 values()
+
+Returns all enum constants:
+
+```java
+for (Day d : Day.values()) {
+    System.out.println(d);
+}
+```
+
+---
+
+### 🔹 valueOf()
+
+Converts string to enum:
+
+```java
+Day d = Day.valueOf("MONDAY");
+System.out.println(d);
+```
+
+👉 These methods are generated automatically by the compiler.
+
+---
+
+## 🟣 30.6 - Enum and Singleton Pattern (Very Important)
+
+Enums provide the **safest and simplest way to implement Singleton** in Java.
+
+```java
+enum Singleton {
+    INSTANCE;
+
+    public void show() {
+        System.out.println("Singleton instance");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Singleton obj = Singleton.INSTANCE;
+        obj.show();
+    }
+}
+```
+
+👉 Why enum Singleton is best?
+
+* Thread-safe by default
+* Prevents reflection attacks
+* Prevents serialization issues
+* Only one instance exists
+
+👉 This is the **recommended way** in modern Java.
+
+---
+
+## 🟢 30.7 - Real-World Understanding
+
+Think of enum like a **fixed set of objects**:
+
+* Days of week
+* Traffic signals
+* Order status
+
+But unlike simple constants, each value:
+
+* Is an object
+* Can have behavior
+* Can follow OOP principles
+
+---
+
+## 🟡 30.8 - Why Enums Are Powerful in OOP
+
+Enums provide:
+
+* Type safety (no invalid values)
+* Built-in object behavior
+* Cleaner code than constants
+* Support for polymorphism
+* Safe Singleton implementation
+
+---
+# 🔷 31. - OBJECT CLONING IN JAVA
+
+Object cloning is the process of creating a **new object that is a copy of an existing object**, including its state (fields). Java provides **`clone()` method** in `java.lang.Object` and the **`Cloneable` interface** to support cloning.
+
+* **`clone()` method** – actually performs the copying.
+* **`Cloneable` interface** – marker interface signaling that cloning is allowed.
+
+Think of cloning like **photocopying a document**: the copy looks exactly like the original, but depending on the type, some parts may still reference the original.
+
+---
+
+## 🧩 31.1 - SHALLOW COPY
+
+A **shallow copy** duplicates the **primitive fields** and **references** to objects, but **nested objects are not cloned**. This means changes to nested objects affect both original and clone.
+
+```java
+class Address {
+    String city;
+    Address(String city) { this.city = city; }
+}
+
+class Employee implements Cloneable {
+    String name;
+    Address address;
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone(); // Shallow copy
+    }
+}
+
+public class TestShallow {
+    public static void main(String[] args) throws CloneNotSupportedException {
+        Employee e1 = new Employee();
+        e1.name = "Alice";
+        e1.address = new Address("NY");
+
+        Employee e2 = (Employee) e1.clone();
+        e2.address.city = "LA";
+
+        System.out.println(e1.address.city); // Output: LA (shallow copy)
+    }
+}
+```
+
+**Diagram – Shallow Copy**
+
+```
+Original Employee
++-------+-----------------+
+| name  | "Alice"         |
+| addr  | Ref -> Address  |
++-------+-----------------+
+
+Cloned Employee
++-------+-----------------+
+| name  | "Alice"         |
+| addr  | Same Ref -> Address
++-------+-----------------+
+```
+
+✅ Problem: Changing `e2.address.city` affects `e1`.
+
+---
+
+## 🔄 31.2 - DEEP COPY
+
+A **deep copy** duplicates **everything recursively**, including nested objects. Changes to the clone do not affect the original.
+
+```java
+class Employee implements Cloneable {
+    String name;
+    Address address;
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Employee cloned = (Employee) super.clone();
+        cloned.address = new Address(this.address.city); // Deep copy
+        return cloned;
+    }
+}
+```
+
+**Diagram – Deep Copy**
+
+```
+Original Employee
++-------+-----------------+
+| name  | "Alice"         |
+| addr  | Ref -> Address  |
++-------+-----------------+
+
+Cloned Employee
++-------+-----------------+
+| name  | "Alice"         |
+| addr  | New Ref -> Address
++-------+-----------------+
+```
+
+✅ Changing `cloned.address.city` does **not affect the original**.
+
+---
+
+## 🧱 31.3 - CLONEABLE WORKFLOW
+
+```
+        Object.clone() (protected)
+                  │
+                  ▼
+       Class implements Cloneable
+                  │
+         Override clone() as public
+                  │
+                  ▼
+        clonedObject = original.clone()
+```
+
+* `Cloneable` allows `clone()` to work without throwing `CloneNotSupportedException`.
+* `super.clone()` performs a **field-by-field copy** (shallow by default).
+
+---
+
+## ⚠️ 31.4 - COMMON PITFALLS WITH CLONEABLE
+
+1. **Marker Interface Only** – no methods are enforced.
+2. **Shallow Copy by Default** – can cause shared mutable state bugs.
+3. **Checked Exception** – `CloneNotSupportedException`.
+4. **Inheritance Issues** – subclasses must override clone properly.
+5. **Protected Access** – must make `clone()` public for external use.
+6. **Complex Deep Copy** – manually cloning nested objects is error-prone.
+
+**Real-world analogy:** Copying an employee record but sharing the **department object** can cause unexpected updates.
+
+---
+
+## 🧠 31.5 - ALTERNATIVES TO CLONEABLE
+
+| Method                                              | Description                            | Pros                         | Cons                           |
+| --------------------------------------------------- | -------------------------------------- | ---------------------------- | ------------------------------ |
+| Copy Constructor                                    | Create new object from existing object | Type-safe, flexible          | Manual work for nested objects |
+| Factory Method                                      | Use static method to return a copy     | Encapsulates object creation | Manual deep copy needed        |
+| Serialization                                       | Serialize & deserialize object         | Deep copy automatically      | Slow, requires Serializable    |
+| Libraries (e.g., Apache Commons SerializationUtils) | Utility for cloning                    | Deep copy out-of-the-box     | Adds dependency                |
+
+**Example – Copy Constructor**
+
+```java
+class Employee {
+    String name;
+    Address address;
+
+    Employee(Employee original) {
+        this.name = original.name;
+        this.address = new Address(original.address.city); // deep copy
+    }
+}
+```
+
+✅ Safer and avoids pitfalls of `Cloneable`.
+
+---
+
+## 🖼️ 31.6 - FULL VISUAL GUIDE OF OBJECT CLONING**
+
+```
+       Original Object
+       +-------------+
+       | fields      |
+       +-------------+
+              │
+   ┌──────────┴─────────────┐
+   │ clone() + Cloneable     │
+   │ (shallow copy by default)│
+   └──────────┬─────────────┘
+              │
+        Shallow Copy
+              │
+      Changes in nested objects affect original
+              │
+              ▼
+        Deep Copy (manual)
+              │
+  Changes in nested objects do NOT affect original
+              │
+    ┌─────────┴─────────────┐
+    │ Alternatives           │
+    │ Copy constructor       │
+    │ Factory method         │
+    │ Serialization          │
+    │ Libraries (Commons)    │
+    └───────────────────────┘
+```
+
+---
+
+## 🎯 31.7 - BEST PRACTICES
+
+1. Prefer **copy constructors or factory methods** instead of `clone()`.
+2. Use `Cloneable` **only for simple objects**.
+3. Always document whether cloning is **shallow or deep**.
+4. Avoid cloning **complex hierarchies** manually unless necessary.
+5. Consider **immutability** – immutable objects don’t need cloning at all.
+
+---
+# 🔵 32. - Inner Classes & Anonymous Classes in Java – Deep OOP Understanding
+
+In Java, **inner classes** are classes defined inside another class. They are used to logically group related classes together and improve encapsulation. Depending on how and where they are defined, inner classes behave differently and have different memory and design implications.
+
+There are four main types:
+
+* Non-static inner class
+* Static nested class
+* Local class
+* Anonymous class
+
+Understanding these is very important, especially because concepts like **memory leaks and object references** are commonly asked in interviews.
+
+---
+
+## 🟣 32.1 - Non-Static Inner Class – Holds Reference to Outer Class**
+
+A **non-static inner class** is defined inside another class without the `static` keyword. The most important characteristic is that it **implicitly holds a reference to the outer class object**.
+
+This means:
+👉 Inner class object cannot exist without outer class object
+
+Let’s see an example:
+
+```java id="r6w4vl"
+class Outer {
+    int x = 10;
+
+    class Inner {
+        void display() {
+            System.out.println("Outer x: " + x);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Outer outer = new Outer();
+        Outer.Inner inner = outer.new Inner();
+
+        inner.display();
+    }
+}
+```
+
+Here, the inner class can directly access the outer class variable `x`.
+
+---
+
+### 🔴 **Memory Leak Risk (Very Important Interview Concept)**
+
+Because the inner class holds a reference to the outer class:
+
+* If the inner class object lives longer
+* It prevents the outer object from being garbage collected
+
+Example scenario:
+
+* Inner class used in long-running thread or listener
+* Outer object becomes unused but cannot be collected
+
+👉 This leads to **memory leaks**
+
+---
+
+## 🟢 32.2 - Static Nested Class – No Outer Reference
+
+A **static nested class** is defined using the `static` keyword. Unlike non-static inner classes, it **does NOT hold a reference to the outer class instance**.
+
+```java id="e1xk3r"
+class Outer {
+    static int x = 20;
+
+    static class Nested {
+        void display() {
+            System.out.println("Outer x: " + x);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Outer.Nested nested = new Outer.Nested();
+        nested.display();
+    }
+}
+```
+
+👉 Key difference:
+
+* No outer object needed
+* No hidden reference
+* No memory leak risk
+
+Static nested classes behave almost like **normal top-level classes**, but are grouped inside another class for better organization.
+
+---
+
+## 🟡 32.3 - Local Class – Defined Inside a Method
+
+A **local class** is defined inside a method and is only accessible within that method.
+
+```java id="92d4u8"
+class Outer {
+
+    void show() {
+        class Local {
+            void display() {
+                System.out.println("Inside local class");
+            }
+        }
+
+        Local l = new Local();
+        l.display();
+    }
+}
+```
+
+👉 Important points:
+
+* Scope limited to method
+* Cannot be accessed outside
+* Can access final or effectively final variables
+
+Local classes are rarely used but useful for **small, method-specific logic**.
+
+---
+
+## 🔴 32.4 - Anonymous Class – One-Time Use Implementation
+
+An **anonymous class** is a class without a name, created and used in a single statement. It is commonly used when you need a **one-time implementation of an interface or abstract class**.
+
+```java id="3qhyba"
+interface Animal {
+    void sound();
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        Animal a = new Animal() {
+            public void sound() {
+                System.out.println("Dog barking");
+            }
+        };
+
+        a.sound();
+    }
+}
+```
+
+👉 Here:
+
+* No class name
+* Created and used instantly
+* Used for quick implementations
+
+---
+
+## 🔵 32.5 - Anonymous Class vs Lambda (Modern Java)
+
+In modern Java, anonymous classes are often replaced by **lambda expressions**, especially for functional interfaces.
+
+```java id="3nx04r"
+// Anonymous class
+Runnable r1 = new Runnable() {
+    public void run() {
+        System.out.println("Running");
+    }
+};
+
+// Lambda (modern way)
+Runnable r2 = () -> System.out.println("Running");
+```
+
+👉 Lambda is:
+
+* Shorter
+* Cleaner
+* More readable
+
+But anonymous classes are still important for:
+
+* Non-functional interfaces
+* Interviews
+
+---
+
+## 🟣 32.6 - Key Difference – Inner Class Types
+
+Each type serves a different purpose:
+
+* Non-static inner → tightly coupled with outer class
+* Static nested → independent, no outer reference
+* Local class → limited to method scope
+* Anonymous class → quick one-time implementation
+
+---
+
+## 🟢 32.7 - Real-World Understanding
+
+Think of inner classes like **roles inside an organization**:
+
+* Non-static inner → Personal assistant (always tied to boss)
+* Static nested → Independent department
+* Local class → Temporary helper in a meeting
+* Anonymous class → Freelancer hired for one task
+
+---
+
+## 🟡 32.8 - Why This Topic is Important
+
+This concept is important because:
+
+* Helps in better class design
+* Prevents memory leaks
+* Improves code organization
+* Used in frameworks and event handling
+
+---
+
+
