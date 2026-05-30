@@ -889,25 +889,83 @@ For example, imagine you have a bank account class. You would never want someone
 
 Let’s see a slightly improved example:
 
+### ❓ Without Encapsulation — What Could Go Wrong?
+
+Imagine a `BankAccount` class **without** encapsulation:
+
+```java
+// ⚠️ BAD DESIGN — No Encapsulation!
+class BankAccount {
+    double balance;  // 😱 public by default!
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+        acc.balance = 10000;
+
+        // 😱 Anyone can do this:
+        acc.balance = -99999;  // Negative balance?! No validation!
+        acc.balance = 0;       // Wiped out! No protection!
+    }
+}
+```
+
+> [!CAUTION]
+> **Without encapsulation**, anyone can set `balance` to `-99999`. There's no guard, no validation, no safety net. This is catastrophic for a real bank!
+
+---
+
+### ✅ With Encapsulation — Safe & Controlled
+
 ```java
 class BankAccount {
 
+    // 🔒 Hidden from outside
     private double balance;
 
+    // 💰 Controlled deposit — with validation!
     public void deposit(double amount) {
         if (amount > 0) {
             balance += amount;
+            System.out.println("✅ Deposited: ₹" + amount);
+        } else {
+            System.out.println("❌ Invalid deposit amount!");
         }
     }
 
+    // 💸 Controlled withdrawal — with safety checks!
     public void withdraw(double amount) {
         if (amount > 0 && amount <= balance) {
             balance -= amount;
+            System.out.println("✅ Withdrawn: ₹" + amount);
+        } else {
+            System.out.println("❌ Insufficient balance or invalid amount!");
         }
     }
 
+    // 📖 Read-only access to balance
     public double getBalance() {
         return balance;
+    }
+
+    // 🚫 NO setBalance() → balance can ONLY change through deposit/withdraw
+}
+```
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+
+        acc.deposit(5000);       // ✅ Deposited: ₹5000
+        acc.withdraw(2000);      // ✅ Withdrawn: ₹2000
+        acc.withdraw(9000);      // ❌ Insufficient balance!
+        acc.deposit(-500);       // ❌ Invalid deposit amount!
+
+        System.out.println("Balance: ₹" + acc.getBalance());  // 3000.0
+
+        // acc.balance = -99999; // ❌ COMPILE ERROR! (private)
     }
 }
 ```
@@ -923,6 +981,31 @@ Another key advantage is **data integrity**. Since all updates go through contro
 Encapsulation is not just about using getters and setters—it is about designing your classes in such a way that **data is protected, behavior is controlled, and the internal implementation is hidden from the outside world**. This concept forms the foundation for building secure, maintainable, and scalable Java applications.
 
 ---
+## 🏗️ 10.3 — The Three Pillars of Encapsulation
+
+```
+                                                 +-------------------+
+                                                 | 💊 Encapsulation  |
+                                                 +-------------------+
+                                                           |
+                              +----------------------------+-----------------------------+
+                              |                            |                             |
+                              v                            v                             v
+                  +-----------------------+  +---------------------------+  +-------------------------+
+                  | 🔒 Data Hiding       |  | 🚪 Controlled Access      |  | 🛡️ Data Integrity       |
+                  | Make fields private   |  | Provide getters & setters |  | Validate inside methods |
+                  +-----------------------+  +---------------------------+  +-------------------------+
+```
+
+| Pillar | What It Means | How You Do It |
+|---|---|---|
+| 🔒 **Data Hiding** | Internal state is invisible to outside | Declare variables as `private` |
+| 🚪 **Controlled Access** | Data is read/written only through methods | Create `public` getters & setters |
+| 🛡️ **Data Integrity** | Invalid data is rejected at the gate | Add `if` checks inside setters |
+
+---
+
+
 # 🔵 11 - Access Modifiers in Java – Controlling Visibility (Encapsulation + Inheritance)
 
 Access modifiers in Java define **where a class, method, or variable can be accessed from**. They are extremely important because they help enforce **encapsulation (data hiding)** and also control how members behave in **inheritance**.
