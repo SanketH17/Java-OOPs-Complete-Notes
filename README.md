@@ -513,6 +513,26 @@ Think of `super` as saying:
 
 This is especially important when the child class **overrides** variables, methods, or constructors of the parent class.
 
+```
++------------------+
+| 🐾 Parent Class  |
+|     Animal       |
++------------------+
+          ^
+          |
+          |  accessed via:
+          |  - super.variable
+          |  - super.method()
+          |  - super()
+          |
++------------------+
+| 🐶 Child Class   |
+|       Dog        |
++------------------+
+
+super = the bridge the child uses to talk to its parent.
+```
+
 ---
 
 ### 🟢 9.1 - Why Do We Need `super`?
@@ -521,9 +541,13 @@ When a child class inherits from a parent class, it automatically gets access to
 
 So, `super` is mainly used in three situations:
 
-1. To access **parent class variables**
-2. To call **parent class methods**
-3. To invoke **parent class constructors**
+| Use Case | Syntax | Purpose |
+|---|---|---|
+| 🔹 Access parent **variable** | `super.variableName` | Resolve variable hiding |
+| 🔹 Call parent **method** | `super.methodName()` | Call overridden method |
+| 🔹 Invoke parent **constructor** | `super()` or `super(args)` | Initialize parent first |
+
+---
 
 We’ll explore each one in detail with examples and diagrams.
 
@@ -537,17 +561,17 @@ When a child class declares a variable with the **same name** as a variable in t
 
 ### 🧠 **Example: Variable Hiding**
 
-```java
+```
 class Animal {
-    String color = "White";
+    String color = "White";   // 🐾 parent's color
 }
 
 class Dog extends Animal {
-    String color = "Black";
+    String color = "Black";   // 🐶 child's color (hides parent!)
 
     void displayColor() {
-        System.out.println("Dog color: " + color);
-        System.out.println("Animal color: " + super.color);
+        System.out.println("Dog color: " + color);         // 🐶 Black
+        System.out.println("Animal color: " + super.color); // 🐾 White
     }
 }
 
