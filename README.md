@@ -827,7 +827,7 @@ In simple terms, encapsulation is like a capsule where the internal details are 
 
 ---
 
-### 🟣 10.1 - How Encapsulation Works – Private Fields & Public Methods**
+### 🟣 10.1 - How Encapsulation Works – Private Fields & Public Methods
 
 In Java, encapsulation is achieved by declaring class variables as **private** and providing access to them through **public getter and setter methods**. By making variables private, we restrict direct access from outside the class, and by using getters and setters, we control how the data is read and modified.
 
@@ -865,7 +865,7 @@ public class Main {
 
         // Setting values using setters
         s.setId(101);
-        s.setName("Rabbani");
+        s.setName("Sanket");
 
         // Getting values using getters
         System.out.println(s.getId());
@@ -873,6 +873,9 @@ public class Main {
     }
 }
 ```
+
+### Core Idea:
+![Encapsulation Core Idea](imgs/img1.png)
 
 In this example, the variables `id` and `name` are not directly accessible from outside the class because they are private. Instead, we use `setId()` and `setName()` to assign values, and `getId()` and `getName()` to retrieve them. This ensures that all access to the data is controlled.
 
