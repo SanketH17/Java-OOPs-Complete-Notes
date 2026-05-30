@@ -110,7 +110,7 @@ Every object in Java has two things:
 
 ### 🏭 Real-World Analogy — The Car Factory
 ```
-+----------------------------+
+                                    +----------------------------+
                        new Car()   | 🚗 Object 1                |
                      +------------>| Red · Sedan · 2024         |
                      |             +----------------------------+
