@@ -2513,28 +2513,32 @@ Variable hiding occurs when a **child class declares a variable with the same na
 
 Java decides **which variable to access based on the reference type**, not the object type. This is known as **compile-time binding**.
 
+> [!IMPORTANT]
+> **The golden rule:** For variables, Java always asks — *"What is the TYPE of the reference?"* — not *"What is the TYPE of the actual object?"*
+
+
 ---
 
-### 🧠 **Variable Hiding Example**
+### 💻 Variable Hiding Example
 
 ```java
 class Parent {
-    int value = 10;
+    int value = 10;   // 👨 Parent's version
 }
 
 class Child extends Parent {
-    int value = 20;
+    int value = 20;   // 👦 Child's version (HIDES parent's)
 }
 
 public class Main {
     public static void main(String[] args) {
-        Parent p = new Child();
+        Parent p = new Child();   // Reference: Parent, Object: Child
         System.out.println(p.value);
     }
 }
 ```
 
-### 🔍 **Output**
+### 🔍 Output
 
 ```
 10
@@ -2542,6 +2546,39 @@ public class Main {
 
 Even though the object is of type `Child`, Java prints `10` because the **reference type is Parent**.
 
+
+**Wait — the object is `Child`, but we got `10` (Parent's value)?!** Yes! Because:
+
+```
+   Parent  p  =  new Child();
+   ──────          ─────────
+      │                │
+   Reference        Actual
+   Type              Object
+      │
+      └──→ Java uses THIS to resolve variables!
+           Parent.value = 10 ✅
+```
+
+### 🧩 What's Inside the Object?
+
+Both values live inside the same object — one just gets priority based on the reference type:
+
+```
+   ┌──────────────────────────────────────┐
+   │        Child Object (in Heap)         │
+   ├──────────────────────────────────────┤
+   │  👨 Parent layer                      │
+   │  ┌──────────────────────────────┐    │
+   │  │ value = 10                   │◄───┼── p.value (Parent ref sees THIS)
+   │  └──────────────────────────────┘    │
+   ├──────────────────────────────────────┤
+   │  👦 Child layer                       │
+   │  ┌──────────────────────────────┐    │
+   │  │ value = 20                   │◄───┼── Only visible with Child ref
+   │  └──────────────────────────────┘    │
+   └──────────────────────────────────────┘
+```
 ---
 
 ### 🧩 **Variable Resolution Flow**
@@ -2591,6 +2628,9 @@ Child Object
    |-- super.value = 10  ← Parent variable
 ```
 
+### 📐 Variable Hiding Rule — Visualized
+![Variable Hiding Rule](imgs/img5.png)
+
 ---
 
 ## 🟠 17.2 - Method Hiding in Java
@@ -2601,26 +2641,30 @@ Method hiding occurs **only with static methods**. When a child class defines a 
 
 Unlike overridden methods, hidden methods are resolved at **compile time**, based on the **reference type**.
 
+> [!WARNING]
+> Method hiding applies **ONLY to static methods**. Non-static (instance) methods are **overridden**, not hidden — and they behave completely differently! This is a common source of confusion for beginners. 
+
+
 ---
 
 ### 🧠 **Method Hiding Example (Static Methods)**
 
 ```java
 class Parent {
-    static void show() {
+    static void show() {   // 👨 Parent's static method
         System.out.println("Parent show()");
     }
 }
 
 class Child extends Parent {
-    static void show() {
+    static void show() {   // 👦 Child's static method (HIDES parent's)
         System.out.println("Child show()");
     }
 }
 
 public class Main {
     public static void main(String[] args) {
-        Parent p = new Child();
+        Parent p = new Child();   // Reference: Parent, Object: Child
         p.show();
     }
 }
@@ -2632,9 +2676,22 @@ public class Main {
 Parent show()
 ```
 
-Even though the object is of `Child`, Java calls `Parent.show()` because **static methods do not support runtime polymorphism**.
+Even though the object is of `Child`, Java calls `Parent.show()` because **static methods do not support runtime polymorphism**. The method call is resolved based on the **reference type**, which is `Parent`.
 
 ---
+
+**Again — the object is `Child`, but `Parent.show()` runs!** Because:
+
+```
+   Parent  p  =  new Child();
+   ──────
+      │
+   Reference Type = Parent
+      │
+      └──→ Static methods resolved by REFERENCE type
+           Parent.show() → CALLED ✅
+           Child.show()  → IGNORED ❌
+```
 
 ### 🧩 Method Hiding Resolution Flow
 
@@ -2643,13 +2700,47 @@ Reference Type → Parent
 Method Call    → show()
 
 Java checks:
-Parent.show() → CALLED
-Child.show()  → IGNORED
+Parent.show() → CALLED ✅
+Child.show()  → IGNORED ❌
 ```
+### 🧩 Resolution Flow
+![Method Hiding Resolution](imgs/img6.png)
+
 
 ---
 
 ## 🔴 17.3 - Method Overriding vs Method Hiding (Critical Difference)
+
+This is the **most confusing** part of inheritance for beginners. The same-looking code behaves **completely differently** depending on whether the method is `static` or not.
+
+### 🔩 Method Hiding (Static Methods)
+```java
+class Parent {
+    static void display() {
+        System.out.println("Parent display()");
+    }
+}
+
+class Child extends Parent {
+    static void display() {
+        System.out.println("Child display()");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Parent p = new Child();
+        p.display();
+    }
+}
+```
+```
+Output: Parent display()
+```
+
+> Java looks at the **reference type** (Parent) → calls **Parent's** version.
+> This is **compile-time** binding. The actual object type doesn't matter.
+<!-- slide -->
 
 ### 🔹 Method Overriding (Instance Methods)
 
@@ -2681,6 +2772,45 @@ Child display()
 ```
 
 Here, **runtime polymorphism** applies, and Java uses the **object type**, not the reference type.
+> Java looks at the **actual object** (Child) → calls **Child's** version.
+> This is **runtime** binding. The reference type doesn't matter.
+
+### 📊 Master Comparison Table
+
+| Feature | 🔩 Method Hiding | ⚡ Method Overriding |
+|---|---|---|
+| **Applies to** | `static` methods | Instance (non-static) methods |
+| **Resolved at** | ⏱️ **Compile time** | 🏃 **Runtime** |
+| **Based on** | **Reference** type | **Object** type |
+| **Keyword** | `static` | (no keyword needed) |
+| **`@Override`** | ❌ Cannot use | ✅ Should use |
+| **Polymorphism?** | ❌ No | ✅ Yes |
+| **Parent version** | Called when ref = Parent | Never called (Child wins) |
+
+---
+
+### 🧩 The Same Code, Two Different Behaviors
+
+```
+   Parent p = new Child();
+   p.display();
+
+   ┌─────────────────────────────────────────────────────┐
+   │  IF display() is STATIC:                            │
+   │                                                     │
+   │  Compiler asks: "What is p's TYPE?"                 │
+   │  → p is Parent                                      │
+   │  → Call Parent.display()                            │
+   │  → OUTPUT: "Parent display()"                       │
+   ├─────────────────────────────────────────────────────┤
+   │  IF display() is NON-STATIC:                        │
+   │                                                     │
+   │  JVM asks: "What is the ACTUAL OBJECT?"             │
+   │  → Object is Child                                  │
+   │  → Call Child.display()                             │
+   │  → OUTPUT: "Child display()"                        │
+   └─────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -2695,21 +2825,23 @@ Here, **runtime polymorphism** applies, and Java uses the **object type**, not t
 
 Static methods belong to the **class**, not to the object. Since polymorphism works with objects, static methods **cannot participate** in runtime binding.
 
+```
+   Instance methods  →  Belong to the OBJECT   →  Objects support polymorphism
+   Static methods    →  Belong to the CLASS     →  Classes don't do polymorphism
+```
+
+Polymorphism means: *"The same method call behaves differently depending on the actual object."* But static methods **don't belong to objects** — they belong to the **class blueprint** itself. Since there's no object involved, there's nothing to "morph" at runtime.
+
+> [!NOTE]
+> Static methods are resolved **at compile time** because the compiler already knows the class type. It doesn't need to wait until runtime to figure out which version to call — it just looks at the **reference type** and decides immediately.
+
+
 That’s why Java treats same-named static methods as **method hiding**, not overriding.
 
----
+### 🧩 Decision Flow — How JVM Resolves Calls
+![Method Resolution Flow](imgs/img7.png)
 
-### 🧩 Static vs Instance Method Flow
 
-```
-Instance Method Call
---------------------
-Reference → Object → Runtime → Child method
-
-Static Method Call
-------------------
-Reference → Compile Time → Parent method
-```
 
 ---
 
@@ -2726,24 +2858,23 @@ Java keeps these rules strict to avoid ambiguity and performance issues.
 
 ## 🟢 17.6 - Final Combined Diagram
 
-```
-                 Parent Class
-           -------------------------
-           variable  static method
-           instance method
-                   ↑
-                   |
-           -------------------------
-                 Child Class
-           variable  static method
-           instance method
-```
+![Hiding Summary Diagram](imgs/img8.png)
 
-* Variables → **Hidden**
-* Static methods → **Hidden**
-* Instance methods → **Overridden**
+| Member Type | What Happens | Resolved At | Based On |
+|---|---|---|---|
+| 🏷️ **Variables** | **Hidden** | ⏱️ Compile time | Reference type |
+| 📋 **Static methods** | **Hidden** | ⏱️ Compile time | Reference type |
+| ⚡ **Instance methods** | **Overridden** | 🏃 Runtime | Object type |
+
+
+> [!IMPORTANT]
+> **The one-line summary:**
+> Hiding follows the **label** (reference type). Overriding follows the **reality** (object type).
 
 ---
+
+
+
 # 🔵 18 - What is Polymorphism in Java? (Core OOP Concept)
 
 **Polymorphism** in Java means **“many forms”**. In Object-Oriented Programming, polymorphism allows **one interface or parent class reference** to represent **many different child class objects**, and each object can respond **in its own way** to the same method call.
@@ -2756,6 +2887,8 @@ This happens when:
 * The child class provides its **own implementation** of a method defined in the parent class
 
 This makes programs **flexible**, **extensible**, and **easy to maintain**.
+
+
 
 ---
 
