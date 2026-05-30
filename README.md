@@ -392,7 +392,7 @@ Here, the default constructor calls the parameterized constructor using `this()`
 `this()` must always be the **first statement** inside a constructor.
 
 ---
-### 🟢  8.2 - Using `super()` – Calling Parent Class Constructor**
+### 🟢  8.2 - Using `super()` – Calling Parent Class Constructor
 
 The `super()` keyword is used to call the constructor of the **parent class**. This is important in inheritance because the parent class must be initialized before the child class.
 
@@ -433,7 +433,7 @@ Even if you don’t write `super()`, Java automatically adds it as the first lin
 
 ---
 
-### 🟡 8.3 - Combining `this()` and `super()` – Execution Flow**
+### 🟡 8.3 - Combining `this()` and `super()` – Execution Flow
 
 You cannot use both `this()` and `super()` in the same constructor because **both must be the first statement**. However, they can still work together indirectly through chaining.
 
@@ -479,7 +479,7 @@ This shows how constructor chaining flows across classes.
 
 ---
 
-### 🔴 8.4 - Key Rules You Must Remember (Very Important)**
+### 🔴 8.4 - Key Rules You Must Remember (Very Important)
 
 Constructor chaining follows strict rules in Java:
 
@@ -491,7 +491,7 @@ Constructor chaining follows strict rules in Java:
 
 ---
 
-### 🔵 8.5 Real-World Understanding**
+### 🔵 8.5 Real-World Understanding
 
 Think of constructor chaining like **building a house step by step**:
 
@@ -529,7 +529,7 @@ We’ll explore each one in detail with examples and diagrams.
 
 ---
 
-### 🟣 9.2 - Using `super` to Access Parent Class Variables**
+### 🟣 9.2 - Using `super` to Access Parent Class Variables
 
 When a child class declares a variable with the **same name** as a variable in the parent class, the parent variable becomes hidden. Java resolves this conflict by letting us use `super.variableName`.
 
