@@ -561,7 +561,7 @@ When a child class declares a variable with the **same name** as a variable in t
 
 ### 🧠 **Example: Variable Hiding**
 
-```
+```java
 class Animal {
     String color = "White";   // 🐾 parent's color
 }
