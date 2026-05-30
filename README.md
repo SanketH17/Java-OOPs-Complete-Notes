@@ -1658,8 +1658,6 @@ Think of inheritance like a **family tree**:
 
 ---
 
----
-
 ## 🟢 13.1 -  Basic Syntax of Inheritance
 
 ```java
@@ -2051,25 +2049,25 @@ In programming, IS-A relationships are implemented using the `extends` keyword (
 ### 🟣 **IS-A Relationship Code Example (Java)**
 
 ```java
-// Parent class
+// Parent class — defines what ALL animals can do
 class Animal {
     void eat() {
-        System.out.println("This animal eats food");
+        System.out.println("This animal eats food.");
     }
 }
 
-// Child class
+// Child class — a Dog IS-A Animal
 class Dog extends Animal {
     void bark() {
-        System.out.println("The dog barks");
+        System.out.println("The dog barks.");
     }
 }
 
 public class Main {
     public static void main(String[] args) {
         Dog dog = new Dog();
-        dog.eat();   // Inherited method
-        dog.bark();  // Dog's own method
+        dog.eat();   // ✅ Inherited from Animal — no need to rewrite!
+        dog.bark();  // ✅ Dog's own unique behavior
     }
 }
 ```
@@ -2110,20 +2108,20 @@ HAS-A is implemented by **creating an object of one class inside another class**
 ### 🟡 HAS-A Relationship Code Example (Java)
 
 ```java
-// Engine class
+// A standalone class representing a part
 class Engine {
     void start() {
-        System.out.println("Engine starts");
+        System.out.println("Engine starts.");
     }
 }
 
-// Car class
+// Car uses Engine — it doesn't inherit from it
 class Car {
-    Engine engine = new Engine();
+    Engine engine = new Engine(); // HAS-A relationship
 
     void drive() {
-        engine.start();
-        System.out.println("Car is moving");
+        engine.start();                      // delegate to Engine
+        System.out.println("Car is moving.");
     }
 }
 
@@ -2135,7 +2133,7 @@ public class Main {
 }
 ```
 
-In this example, **Car HAS-A Engine**. The `Car` class does not inherit from `Engine`. Instead, it **uses** the `Engine` object to perform its function.
+In this example, **Car HAS-A Engine**. The `Car` class does not inherit from `Engine`. Instead, it **uses** the `Engine` object to perform its function. This allows us to change the `Engine` class without affecting the `Car` class, as long as the interface (the methods) remains the same. This is a key advantage of composition and aggregation. 
 
 ---
 
@@ -2159,10 +2157,14 @@ To understand when to use IS-A or HAS-A, imagine the sentence you are forming:
 
 If the sentence sounds **natural and logical**, then the relationship is probably correct.
 
-- ✔ “A Dog is an Animal” → IS-A  
-- ❌ “A Dog is an Engine” → Incorrect  
-- ✔ “A Car has an Engine” → HAS-A  
-- ❌ “A Car is an Engine” → Incorrect  
+```
+✅ "A Dog IS AN Animal"      → Use inheritance (extends)
+✅ "A Car HAS AN Engine"     → Use composition (create object inside class)
+ 
+❌ "A Dog IS AN Engine"      → Doesn't make sense — wrong relationship
+❌ "A Car IS AN Engine"      → Doesn't make sense — wrong relationship
+```
+> 💡 Tip : If the IS-A sentence sounds weird or forced, don't use inheritance. Use composition instead. This is one of the most common design mistakes to avoid. 
 
 This thinking helps avoid common design mistakes made by beginners.
 
@@ -2179,25 +2181,34 @@ In real applications, we often use **both relationships together** to model comp
 ```java
 class Engine {
     void start() {
-        System.out.println("Engine started");
+        System.out.println("Engine started.");
     }
 }
-
+ 
 class Vehicle {
     void move() {
-        System.out.println("Vehicle moves");
+        System.out.println("Vehicle moves.");
     }
 }
-
+ 
+// Car IS-A Vehicle  →  extends Vehicle
+// Car HAS-A Engine  →  contains Engine object
 class Car extends Vehicle {
     Engine engine = new Engine();
-
+ 
     void drive() {
-        engine.start();
-        move();
-        System.out.println("Car is driving");
+        engine.start(); // uses its Engine
+        move();         // inherits from Vehicle
+        System.out.println("Car is driving.");
     }
 }
+```
+ 
+**Output:**
+```
+Engine started.
+Vehicle moves.
+Car is driving.
 ```
 
 Here:
@@ -2231,6 +2242,18 @@ Using the correct relationship makes your code:
 - Closer to real-world thinking
   
 ---
+
+
+
+
+
+
+
+
+
+
+
+
 # 🔵 15 - Association in Java – Basic Relationship Between Objects
 
 Association is one of the simplest forms of relationship in Object-Oriented Programming. It represents a **"uses-a" or "has-a" relationship** between two classes. In this relationship, one object is connected to another object, but both objects can **exist independently** of each other.
