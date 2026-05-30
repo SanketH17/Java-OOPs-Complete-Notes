@@ -1021,22 +1021,59 @@ Java provides four types of access modifiers:
 
 Each of these has a different level of visibility.
 
+### 🏢 The Building Analogy — Used Throughout This Guide
+
+Think of your Java project as a **building with floors and rooms**. Each access modifier is like a **different type of key card**:
+
+```
+   ┌─────────────────────────────────────────────────┐
+   │                🌍 PUBLIC                         │
+   │  Open to everyone — lobby, reception             │
+   │  ┌─────────────────────────────────────────┐     │
+   │  │          🛡️ PROTECTED                    │     │
+   │  │  Floor access — employees + family        │     │
+   │  │  ┌─────────────────────────────────┐     │     │
+   │  │  │        👥 DEFAULT                │     │     │
+   │  │  │  Department-only access          │     │     │
+   │  │  │  ┌─────────────────────────┐     │     │     │
+   │  │  │  │     🔒 PRIVATE           │     │     │     │
+   │  │  │  │  Personal locker         │     │     │     │
+   │  │  │  │  Only YOU can open it    │     │     │     │
+   │  │  │  └─────────────────────────┘     │     │     │
+   │  │  └─────────────────────────────────┘     │     │
+   │  └─────────────────────────────────────────┘     │
+   └─────────────────────────────────────────────────┘
+```
+
+### 🧩 Java's Four Access Modifiers at a Glance
+![Access Modifiers at a Glance](imgs/img2.png)
+
 ---
 
 ### 🟣 11.1 - `private` – Accessible Only Within Same Class
 
-The `private` access modifier provides the **highest level of restriction**. A private member can only be accessed **within the same class**. It cannot be accessed outside the class, even by subclasses.
+The `private` modifier is the **most restrictive**. A private member can only be seen and used **inside the class that declares it**. Nothing outside — not even a child class that extends it — can touch it directly.
+
+This is the **backbone of encapsulation**. You make your variables `private` to protect them, and then provide `public` getter/setter methods as controlled doors.
 
 This is mainly used for **data hiding**, which is a core part of encapsulation.
 
+### 🏢 Analogy
+
+> `private` = Your **personal locker** at the office. Only *you* have the key. Not your teammates, not your boss, not even your family members who work in the same building.
+
 ```java
 class Person {
-    private int age;
+    private int age;  // 🔒 Only Person class can see this
 
+    // 🚪 Controlled door — public setter
     public void setAge(int age) {
-        this.age = age;
+        if (age >= 0 && age <= 150) {
+            this.age = age;
+        }
     }
 
+    // 🚪 Controlled door — public getter
     public int getAge() {
         return age;
     }
@@ -1046,9 +1083,11 @@ public class Main {
     public static void main(String[] args) {
         Person p = new Person();
 
-        // p.age ❌ not accessible directly
-        p.setAge(25);
-        System.out.println(p.getAge());
+        // ❌ p.age = 25;        → COMPILE ERROR! (private)
+        // ❌ Can't touch it directly
+
+        p.setAge(25);            // ✅ Goes through the controlled door
+        System.out.println(p.getAge());  // ✅ 25
     }
 }
 ```
@@ -1060,51 +1099,213 @@ Here, `age` is private, so it cannot be accessed directly. We use getter and set
 * Not accessible in subclass ❌
 * Only accessible through methods ✔️
 
+### 🧬 How Does `private` Behave in Inheritance?
+
+```java
+class Person {
+    private int age = 30;  // 🔒 private
+}
+
+class Student extends Person {
+    void display() {
+        // System.out.println(age);  ❌ COMPILE ERROR!
+        // Even though Student "extends" Person, it CANNOT see age.
+        // It must use getAge() if Person provides one.
+    }
+}
+```
+> [!IMPORTANT]
+> **Private members are NOT inherited.** The child class doesn't even know they exist. The only way to interact with them is through `public` or `protected` methods that the parent provides.
+
+### 📋 Visibility Summary
+
+| Context | Accessible? |
+|---|---|
+| Same class | ✅ Yes |
+| Same package, different class | ❌ No |
+| Same package, subclass | ❌ No |
+| Different package, subclass | ❌ No |
+| Different package, non-subclass | ❌ No |
+
+---
+
 ---
 
 ### 🟢 11.2 - `default` – Accessible Within Same Package
 
 If you don’t specify any modifier, Java uses the **default access modifier** (also called package-private). Members with default access can be accessed **only within the same package**.
+If another class is in the same package, it can access this method. But if it is in a different package, it cannot.
+
+### 💻 Code Example
 
 ```java
+// 📁 File: Animal.java (package: animals)
+package animals;
+
 class Animal {
-    void sound() {
-        System.out.println("Animal sound");
+    void sound() {   // 👥 No modifier = default access
+        System.out.println("Animal makes a sound");
     }
 }
 ```
 
-If another class is in the same package, it can access this method. But if it is in a different package, it cannot.
+```java
+// 📁 File: Dog.java (package: animals) — SAME package
+package animals;
 
+class Dog {
+    void test() {
+        Animal a = new Animal();
+        a.sound();   // ✅ Works! Same package.
+    }
+}
+```
+
+```java
+// 📁 File: Main.java (package: app) — DIFFERENT package
+package app;
+
+import animals.Animal;
+
+class Main {
+    void test() {
+        Animal a = new Animal();
+        // a.sound();  ❌ COMPILE ERROR! Different package.
+    }
+}
+```
+
+### 🧬 How Does `default` Behave in Inheritance?
 👉 In inheritance:
 
 * Same package subclass → accessible ✔️
 * Different package subclass → not accessible ❌
 
----
-
-### 🟡 11.3 - `protected` – Accessible in Same Package + Subclasses**
-
-The `protected` modifier is slightly less restrictive than default. It allows access:
-
-* Within the same package
-* In subclasses (even if they are in different packages)
-
 ```java
-class Animal {
-    protected void sound() {
-        System.out.println("Animal sound");
-    }
-}
-
-class Dog extends Animal {
-    void display() {
-        sound(); // accessible
+// 📁 Same package → subclass CAN access
+package animals;
+class Cat extends Animal {
+    void test() {
+        sound();  // ✅ Inherited and accessible (same package)
     }
 }
 ```
 
-Here, the `Dog` class can access the protected method because it is a subclass.
+```java
+// 📁 Different package → subclass CANNOT access
+package pets;
+import animals.Animal;
+class PetCat extends Animal {
+    void test() {
+        // sound();  ❌ COMPILE ERROR! Different package.
+    }
+}
+```
+
+> [!NOTE]
+> Default access is **package-dependent**, not inheritance-dependent. Even if `PetCat` is a subclass of `Animal`, it can't access default members across packages.
+
+### 📋 Visibility Summary
+
+| Context | Accessible? |
+|---|---|
+| Same class | ✅ Yes |
+| Same package, different class | ✅ Yes |
+| Same package, subclass | ✅ Yes |
+| Different package, subclass | ❌ No |
+| Different package, non-subclass | ❌ No |
+
+---
+
+---
+
+### 🟡 11.3 - `protected` – Accessible in Same Package + Subclasses**
+
+The `protected` modifier opens the door a little wider than `default`. It allows access in two situations:
+
+1. **Any class** in the **same package** (just like `default`)
+2. **Subclasses** even if they are in a **different package** (this is the extra power!)
+
+This makes `protected` the **go-to modifier for inheritance-friendly members** — things you want to share with your children but not with the entire world.
+
+### 🏢 Analogy
+
+> `protected` = The **family recipe book** 📖. Everyone in your household (same package) can read it. Your children who moved to another city (subclass in different package) can still access it because they're family. But your neighbor (non-subclass in different package)? No access.
+
+---
+### 💻 Code Example
+
+```java
+// 📁 File: Animal.java (package: animals)
+package animals;
+
+public class Animal {
+    protected void sound() {   // 🛡️ protected
+        System.out.println("Animal makes a sound");
+    }
+}
+```
+
+```java
+// 📁 File: Dog.java (package: pets) — DIFFERENT package, but subclass!
+package pets;
+
+import animals.Animal;
+
+class Dog extends Animal {
+    void display() {
+        sound();  // ✅ Works! Dog is a subclass of Animal.
+    }
+}
+```
+
+```java
+// 📁 File: Trainer.java (package: pets) — DIFFERENT package, NOT a subclass!
+package pets;
+
+import animals.Animal;
+
+class Trainer {
+    void test() {
+        Animal a = new Animal();
+        // a.sound();  ❌ COMPILE ERROR! Trainer is NOT a subclass.
+    }
+}
+```
+
+### 🧬 The Key Insight
+
+```
+     📁 Package: animals               📁 Package: pets
+   ┌─────────────────────┐          ┌─────────────────────┐
+   │  Animal              │          │  Dog extends Animal  │
+   │  🛡️ protected sound()│          │  sound() → ✅        │
+   │                      │          │                      │
+   │  Zookeeper           │          │  Trainer             │
+   │  sound() → ✅        │          │  sound() → ❌        │
+   │  (same package)      │          │  (not a subclass)    │
+   └─────────────────────┘          └─────────────────────┘
+```
+
+> [!TIP]
+> **When to use `protected`?** When you're designing a class that's meant to be extended, and you want subclasses to have access to certain internal details — but you still want to keep those details hidden from the general public.
+
+### 📋 Visibility Summary
+
+| Context | Accessible? |
+|---|---|
+| Same class | ✅ Yes |
+| Same package, different class | ✅ Yes |
+| Same package, subclass | ✅ Yes |
+| Different package, subclass | ✅ Yes |
+| Different package, non-subclass | ❌ No |
+
+---
+
+
+
+
+
 
 👉 In inheritance:
 
@@ -1116,7 +1317,13 @@ Here, the `Dog` class can access the protected method because it is a subclass.
 
 ### 🔴 11.4 - `public` – Accessible Everywhere
 
-The `public` modifier provides the **least restriction**. Public members can be accessed from anywhere in the program, regardless of package or inheritance.
+The `public` modifier is the **most open** — zero restrictions. A public member can be accessed from **anywhere in the entire program**, no matter which package or class is trying to use it.
+
+This is used for things you **intentionally want to expose** to the outside world — like your API methods, main classes, and utility functions.
+
+### 🏢 Analogy
+
+> `public` = The **company's reception desk** 🌍. Anyone can walk in — employees, visitors, delivery agents, even random strangers. It's designed to be fully accessible.
 
 ```java
 class Animal {
@@ -1137,29 +1344,58 @@ public class Main {
 
 * Accessible everywhere ✔️
 
+### 📋 Visibility Summary
+
+| Context | Accessible? |
+|---|---|
+| Same class | ✅ Yes |
+| Same package, different class | ✅ Yes |
+| Same package, subclass | ✅ Yes |
+| Different package, subclass | ✅ Yes |
+| Different package, non-subclass | ✅ Yes |
+
 ---
 
 ### 🔵 11.5 - Access Modifiers with Inheritance – Clear Understanding
 
-Let’s combine everything to understand how access modifiers behave in inheritance:
+Now let's put all four modifiers in **one parent class** and see exactly what a child class can and cannot access:
+
+### 💻 Combined Code Example
 
 ```java
 class Parent {
-    private int a = 10;
-    int b = 20;           // default
-    protected int c = 30;
-    public int d = 40;
+    private   int a = 10;   // 🔒 private
+              int b = 20;   // 👥 default (no modifier)
+    protected int c = 30;   // 🛡️ protected
+    public    int d = 40;   // 🌍 public
 }
 
 class Child extends Parent {
     void display() {
-        // System.out.println(a); ❌ not accessible
-        System.out.println(b); // depends on package
-        System.out.println(c); // accessible
-        System.out.println(d); // accessible
+        // System.out.println(a);  ❌ private — invisible to child
+        System.out.println(b);     // ⚠️ depends on package (same = ✅, different = ❌)
+        System.out.println(c);     // ✅ protected — always visible to subclass
+        System.out.println(d);     // ✅ public — always visible to everyone
     }
 }
 ```
+
+### 🧩 What the Child Sees
+
+```
+   Parent Object (inside Child)
+   ┌──────────────────────────────────────────────┐
+   │  🔒 private   a = 10   →  ❌ INVISIBLE       │
+   │  👥 default   b = 20   →  ⚠️ Same pkg only   │
+   │  🛡️ protected c = 30   →  ✅ VISIBLE          │
+   │  🌍 public    d = 40   →  ✅ VISIBLE          │
+   └──────────────────────────────────────────────┘
+```
+
+> [!NOTE]
+> The `private` member `a` still **exists** inside the object (memory is allocated for it), but the child class simply **cannot see or use it**. It's like a locked room inside your inherited house — the room is there, but you don't have the key.
+
+---
 
 Here’s what happens:
 
