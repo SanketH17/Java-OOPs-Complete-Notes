@@ -2273,7 +2273,7 @@ class Teacher {
 
 class Student {
     String name;
-    Teacher teacher; // Association
+    Teacher teacher;  // 🔗 Association — Student KNOWS a Teacher
 
     Student(String name, Teacher teacher) {
         this.name = name;
@@ -2288,15 +2288,45 @@ class Student {
 
 public class Main {
     public static void main(String[] args) {
-        Teacher t = new Teacher("Mr. John");
-        Student s = new Student("Rabbani", t);
+        Teacher t = new Teacher("Mr. John");    // 👩‍🏫 exists independently
+        Student s = new Student("Sanket", t);  // 👨‍🎓 linked to teacher
 
         s.display();
     }
 }
 ```
 
+**Output:**
+```
+Student: Sanket
+Teacher: Mr. John
+```
+### 🧩 What's Happening in Memory?
+
+```
+   HEAP MEMORY
+   ┌──────────────────┐     ┌──────────────────┐
+   │  Teacher Object   │    │  Student Object  │
+   │  name: "Mr. John"│◄────│  name: "Rabbani" │
+   │                   │    │  teacher:   ─────┼──────┐
+   └──────────────────┘     └──────────────────┘     │
+          ▲                                          │
+          └────────────── reference ───────────────--┘
+```
+
+> [!NOTE]
+> The `Student` holds a **reference** to the `Teacher`, but the `Teacher` object was created **outside** the student. Both objects are **independent** — this is a loose, flexible relationship.
+
 In this example, the `Student` class is associated with the `Teacher` class. The student uses the teacher object, but both can exist independently. This is a **loose relationship**, and it is the foundation for more specific relationships like aggregation and composition.
+```
+  Weakest ◄──────────────────────────────────► Strongest
+
+  🔗 Association     🤝 Aggregation     🔩 Composition
+  "knows-a"          "has-a"             "part-of"
+  (loose)            (weak ownership)    (strong ownership)
+```
+
+Let's explore each one.
 
 ---
 
@@ -2321,11 +2351,11 @@ class Employee {
 
 class Department {
     String deptName;
-    Employee emp; // Aggregation
+    Employee emp;  // 🤝 Aggregation — Department HAS an Employee
 
     Department(String deptName, Employee emp) {
         this.deptName = deptName;
-        this.emp = emp;
+        this.emp = emp;  // Employee created OUTSIDE, passed IN
     }
 
     void display() {
@@ -2336,12 +2366,24 @@ class Department {
 
 public class Main {
     public static void main(String[] args) {
-        Employee e = new Employee("Rabbani");
-        Department d = new Department("IT", e);
+        Employee e = new Employee("Sanket");       // 👨‍💼 Created OUTSIDE
+        Department d = new Department("IT", e);     // 🏢 Passed IN
 
         d.display();
+
+        // If we set d = null (destroy department)...
+        d = null;
+        // 👨‍💼 Employee 'e' STILL EXISTS!
+        System.out.println(e.name + " still alive! ✅");
     }
 }
+```
+
+**Output:**
+```
+Department: IT
+Employee: Sanket
+Sanket still alive! ✅
 ```
 
 Here, the `Department` has an `Employee`, but the employee object exists independently. Even if the department object is removed, the employee still exists. This makes aggregation a **weak relationship**.
@@ -2350,31 +2392,46 @@ Here, the `Department` has an `Employee`, but the employee object exists indepen
 
 ## 🟢 15.2 - Composition in Java – Strong "Has-A" Relationship
 
-Composition is a stronger form of aggregation. It represents a **"part-of" relationship**, where one object **cannot exist without the other**. In composition, the contained object’s lifecycle is completely dependent on the container object.
+ [!TIP]
+> **One-liner:** Composition = *"I created it, I own it, and if I die — it dies with me."*
 
-In simple terms, if the parent object is destroyed, the child object is also destroyed.
+Composition is a **stronger form of aggregation** where one object is a **part of** another object. The contained object is created **inside** the container, and its lifecycle is **completely tied** to the container. If the parent is destroyed, the child is destroyed too.
 
-A common real-world example is a **House and Room**. A room cannot exist without a house.
+### 🚗 Real-World Analogy — Car & Engine
 
-Let’s understand with code:
+```
+   🚗 Car
+       │
+       │  CONTAINS ──→ 🔧 Engine
+       │
+       │  The engine was BUILT INSIDE the car.
+       │  If the car is scrapped...
+       │
+       └──→ 🔧 Engine is scrapped too!
+             (It has no life outside this car)
+```
+
+> A room cannot exist without its house. A heart cannot function outside its body. An engine built into a car doesn't have an independent existence. **That's composition.**
+
+---
 
 ```java
 class Engine {
     void start() {
-        System.out.println("Engine started");
+        System.out.println("🔧 Engine started");
     }
 }
 
 class Car {
-    private Engine engine; // Composition
+    private Engine engine;  // 🔩 Composition — Car OWNS the Engine
 
     Car() {
-        engine = new Engine(); // Engine created inside Car
+        engine = new Engine();  // ⚡ Engine created INSIDE Car!
     }
 
     void startCar() {
         engine.start();
-        System.out.println("Car started");
+        System.out.println("🚗 Car started");
     }
 }
 
@@ -2382,9 +2439,19 @@ public class Main {
     public static void main(String[] args) {
         Car car = new Car();
         car.startCar();
+
+        // Nobody outside has access to the Engine.
+        // If car = null → Engine is also gone. No independent existence.
     }
 }
 ```
+
+**Output:**
+```
+🔧 Engine started
+🚗 Car started
+```
+![Composition](imgs/img4.png)
 
 In this example, the `Engine` object is created inside the `Car` class. There is no way to use the engine independently outside the car. If the car is destroyed, the engine also becomes useless. This makes composition a **strong relationship with tight coupling**.
 
