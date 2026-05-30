@@ -583,6 +583,12 @@ public class Main {
 }
 ```
 
+**Output:**
+```
+Dog color: Black
+Animal color: White
+```
+
 Here, both `Animal` and `Dog` have a variable named `color`.
 
 * `color` refers to the **child class variable**
@@ -613,14 +619,15 @@ When a child class **overrides** a method from the parent class, the child’s v
 ```java
 class Animal {
     void sound() {
-        System.out.println("Animal makes a sound");
+        System.out.println("Animal makes a sound 🔊");
     }
 }
 
 class Dog extends Animal {
+    @Override
     void sound() {
-        super.sound(); // parent method
-        System.out.println("Dog barks");
+        super.sound();  // 🐾 call parent's version FIRST
+        System.out.println("Dog barks 🐕");  // 🐶 then add child behavior
     }
 }
 
@@ -630,6 +637,12 @@ public class Main {
         d.sound();
     }
 }
+```
+
+**Output:**
+```
+Animal makes a sound 🔊
+Dog barks 🐕
 ```
 
 In this example, the `Dog` class overrides the `sound()` method.
@@ -659,19 +672,19 @@ If we don’t explicitly write `super()`, Java automatically inserts a **no-argu
 
 ---
 
-### 🧠 **Example: Constructor Chaining**
+### 🧠 **Example: Default Constructor**
 
 ```java
 class Animal {
     Animal() {
-        System.out.println("Animal constructor called");
+        System.out.println("🐾 Animal constructor called");
     }
 }
 
 class Dog extends Animal {
     Dog() {
-        super(); // calls Animal constructor
-        System.out.println("Dog constructor called");
+        super();  // ← Java adds this even if you don't write it!
+        System.out.println("🐶 Dog constructor called");
     }
 }
 
@@ -680,6 +693,12 @@ public class Main {
         Dog d = new Dog();
     }
 }
+```
+
+**Output:**
+```
+🐾 Animal constructor called
+🐶 Dog constructor called
 ```
 
 ---
@@ -702,30 +721,41 @@ If the parent class has a **parameterized constructor**, the child **must** call
 
 ```java
 class Animal {
-    Animal(String type) {
+    Animal(String type) {  // ← No default constructor!
         System.out.println("Animal type: " + type);
     }
 }
 
 class Dog extends Animal {
     Dog() {
-        super("Mammal");
+        super("Mammal");  // ✅ REQUIRED — must match parent's constructor
         System.out.println("Dog constructor");
     }
 }
 ```
+**Output:**
+```
+Animal type: Mammal
+Dog constructor
+```
+### 🧩 Why Does This Fail Without `super("Mammal")`?
+```
+  ❌ Dog()  →  Java tries to add super()  →  No Animal() exists  →  COMPILE ERROR!
 
-Without `super("Mammal")`, the code would **not compile**.
+  ✅ Dog()  →  super("Mammal")  →  Animal(String type) found  →  SUCCESS!
+```
 
 ---
 
 ### 🟢 9.5 - Rules and Important Points About `super`
 
-The `super()` constructor call **must be the first statement** inside a constructor. Java enforces this rule because the parent must be fully initialized before the child.
-
-The `super` keyword **cannot be used inside a static context** because static members belong to the class, not to an object.
-
-`super` always refers to the **immediate parent**, not to grandparents directly.
+| # | Rule | Why? |
+|---|---|---|
+| 1️⃣ | `super()` must be the **first statement** in a constructor | Parent must be fully built before child |
+| 2️⃣ | `super` **cannot** be used in a `static` context | `super` needs an object; `static` has no object |
+| 3️⃣ | `super` refers to the **immediate** parent only | No skipping to grandparent — Java goes one level up |
+| 4️⃣ | You **cannot** use both `this()` and `super()` in the same constructor | Both must be the first statement — only one slot! |
+| 5️⃣ | If you don't write `super()`, Java adds it **automatically** | Ensures parent is always initialized |
 
 ---
 
@@ -757,6 +787,17 @@ Even though both are reference variables:
 * `super` refers to the **parent class object**
 
 They help Java resolve **ambiguity** in inheritance scenarios.
+
+| Feature | `this` | `super` |
+|---|---|---|
+| **Refers to** | Current class object | Parent class object |
+| **Used for variables** | `this.x` → current class `x` | `super.x` → parent class `x` |
+| **Used for methods** | `this.method()` → current class method | `super.method()` → parent class method |
+| **Used for constructors** | `this()` → another constructor in same class | `super()` → parent class constructor |
+| **Must be first statement?** | Yes (in constructor) | Yes (in constructor) |
+| **Works in static?** | ❌ No | ❌ No |
+| **Analogy** | *"I'll do it myself"* | *"Let me ask my parent"* |
+
 
 ---
 
